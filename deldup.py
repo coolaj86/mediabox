@@ -6,23 +6,45 @@
 
 import os
 import sys
-import md5
+import hashlib
 # TODO port to ADOdb / SQLAlchemy
 import sqlite3
 import optparse
 import time
 
-parser = optparse.OptionParser()
+usage = "usage: %prog [options] path1 path2 ..."
+parser = optparse.OptionParser(usage=usage)
 parser.add_option("-v", 
     "--verbose", 
     dest="verbose", 
     action="store_true", 
     help="Display more information. -v -v -v for most verbose.")
+parser.add_option("-d", 
+    "--database", 
+    dest="database", 
+    action="store",
+    type="string",
+    default="/tmp/fq.sqlite3", 
+    help="Select a database in which to store the file data")
+parser.add_option("-m", 
+    "--min-size", 
+    dest="min_size",
+    default=(512*1024*4), 
+    action="store", 
+    type="int",
+    help="The minimum size (in bytes) of the files catalogued (512kb default)") 
+parser.add_option("-l", 
+    "--link-type", 
+    dest="link_type",
+    default="hard", 
+    action="store", 
+    type="string",
+    help="one of hard (default), soft, delete") 
 options, args = parser.parse_args()
 #print args
 #sys.exit()
 
-DB_FILE = '/root/filequery.db'
+DB_FILE = options.database
 KB = 1000
 MB = 1000 * KB
 
@@ -32,7 +54,7 @@ c = db.cursor()
 
 def sumfile(fobj):
     '''Returns an md5 hash for an object with read() method.'''
-    m = md5.new()
+    m = hashlib.md5()
     while True:
         d = fobj.read(8096)
         if not d:
@@ -65,7 +87,7 @@ def toUTF8(string):
 
 print '''Now search through files to find matches'''
 md5matches = []
-c.execute('''SELECT md5sum FROM Files WHERE size > ? GROUP BY md5sum HAVING COUNT() > 1 ORDER BY size DESC''', ( 10 * KB, ) )
+c.execute('''SELECT md5sum FROM Files WHERE size > ? GROUP BY md5sum HAVING COUNT() > 1 ORDER BY size DESC''', ( options.min_size, ) )
 for row in c:
     md5matches.append(row[0])
 for md5match in md5matches:
@@ -87,16 +109,28 @@ for md5match in md5matches:
             print 'MISSING - file go bye-bye:', maybematch
             continue
 
+        # A duplicate file exists not just in the database, but on the disk
         if truematch and os.lstat(truematch): # Check each time that it is still there
+            if truematch == maybematch:
+                raise Exception('ERROR', 'The database has the same file twice')
+                # TODO use tempfile to precopy any file, which alieviatees this case
             if lstat_tm.st_ino == lstat_mm.st_ino and lstat_tm.st_dev == lstat_mm.st_dev:
                 print '\tSKIP - already linked', maybematch
                 continue
             if md5match != md5sum(maybematch):
                 print '\tSKIP - mismatch on checksum:', maybematch
                 continue
-            time.sleep(0.01) #BUG my PC overheats
-            os.unlink(os.path.join(row[0],row[1]))
-            os.link(truematch, os.path.join(row[0],row[1]))
+            if 'hard' == options.link_type:
+              os.unlink(os.path.join(row[0],row[1]))
+              os.link(truematch, os.path.join(row[0],row[1]))
+            elif 'soft' == options.link_type:
+              os.unlink(os.path.join(row[0],row[1]))
+              os.symlink(os.path.realpath(truematch), os.path.join(row[0],row[1]))
+            elif 'delete' == options.link_type:
+              os.unlink(os.path.join(row[0],row[1]))
+            else:
+              raise Exception('Yipes','Somehow "link_type" is not set correctly!')
+              
             print '\t', os.path.join(row[0],row[1])
         else:
             if md5match != md5sum(maybematch):

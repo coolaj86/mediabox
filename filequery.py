@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+#
+# USAGE: filequery.py [options] path1 path2 ...
+#
+
 import os
 import sys
 import md5sum
@@ -7,17 +11,32 @@ import md5sum
 import sqlite3
 import optparse
 
-parser = optparse.OptionParser()
+usage = "usage: %prog [options] path1 path2 ..."
+parser = optparse.OptionParser(usage=usage)
 parser.add_option("-v", 
     "--verbose", 
     dest="verbose", 
     action="store_true", 
     help="Display more information. -v -v -v for most verbose.")
+parser.add_option("-d", 
+    "--database", 
+    dest="database", 
+    action="store",
+    type="string",
+    default="/tmp/fq.sqlite3", 
+    help="Select a database in which to store the file data")
+parser.add_option("-m", 
+    "--min-size", 
+    dest="min_size",
+    default=(512*1024*4), 
+    action="store", 
+    type="int",
+    help="The minimum size (in bytes) of the files catalogued (512kb default)") 
 options, args = parser.parse_args()
 #print args
 #sys.exit()
 
-DB_FILE = '/root/filequery.db'
+DB_FILE = options.database
 MB = 1000 * 1000
 ENCODING = 'utf-8'
 
@@ -81,6 +100,8 @@ for a_path in args:
                 print >> sys.stderr, 'Failed to lstat %s' % (filepath)
                 fail = True
             if True == fail:
+                continue
+            if nfo.st_size < options.min_size:
                 continue
 
             try:

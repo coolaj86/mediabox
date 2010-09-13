@@ -8,10 +8,11 @@ from sqlalchemy import *
 from datetime import datetime
 
 # Put file info in the database
-sqlite3_db_location = 'test'
+sqlite3_db_location = 'media-box-test'
 
 metadata = MetaData('sqlite:///tmp/' + sqlite3_db_location + '.sqlite')
 
+# http://truefalsemaybe.com/2008/09/sqlalchemy-migrations/
 file_table = Table(
     'tf_file', metadata,
     Column('id', Integer, primary_key=True),
