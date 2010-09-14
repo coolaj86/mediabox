@@ -28,7 +28,7 @@ parser.add_option("-d",
 parser.add_option("-m", 
     "--min-size", 
     dest="min_size",
-    default=(512*1024*4), 
+    default=(512*1024), 
     action="store", 
     type="int",
     help="The minimum size (in bytes) of the files catalogued (512kb default)") 
@@ -43,7 +43,7 @@ ENCODING = 'utf-8'
 db = sqlite3.connect(DB_FILE)
 db.row_factory = sqlite3.Row
 #db.text_factory = sqlite3.OptimizedUnicode
-#db.text_factory = lambda x: unicode(x, ENCODING, "ignore")
+db.text_factory = lambda x: unicode(x, ENCODING, "ignore")
 c = db.cursor()
 
 def initdb(c):

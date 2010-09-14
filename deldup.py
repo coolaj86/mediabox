@@ -29,7 +29,7 @@ parser.add_option("-d",
 parser.add_option("-m", 
     "--min-size", 
     dest="min_size",
-    default=(512*1024*4), 
+    default=(512*1024), 
     action="store", 
     type="int",
     help="The minimum size (in bytes) of the files catalogued (512kb default)") 
@@ -49,7 +49,7 @@ KB = 1000
 MB = 1000 * KB
 
 db = sqlite3.connect(DB_FILE)
-#db.text_factory = sqlite3.OptimizedUnicode
+db.text_factory = sqlite3.OptimizedUnicode
 c = db.cursor()
 
 def sumfile(fobj):
@@ -114,7 +114,7 @@ for md5match in md5matches:
             if truematch == maybematch:
                 raise Exception('ERROR', 'The database has the same file twice')
                 # TODO use tempfile to precopy any file, which alieviatees this case
-            if lstat_tm.st_ino == lstat_mm.st_ino and lstat_tm.st_dev == lstat_mm.st_dev:
+            if 'hard' == options.link_type and lstat_tm.st_ino == lstat_mm.st_ino and lstat_tm.st_dev == lstat_mm.st_dev:
                 print '\tSKIP - already linked', maybematch
                 continue
             if md5match != md5sum(maybematch):
@@ -136,7 +136,7 @@ for md5match in md5matches:
             if md5match != md5sum(maybematch):
                 continue
             truematch = maybematch
-            print md5match, os.path.join(row[0],row[1])
+            print md5match, str(os.path.join(toUTF8(row[0]),toUTF8(row[1])))
 
 """
 # 'Guaranteed' either dup_name or same_hash
