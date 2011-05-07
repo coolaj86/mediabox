@@ -12,6 +12,11 @@ Check the directory in `checksum-and-move.js` and all of your m4a and mp3 fills 
 
     ./checksum-and-move.sh
 
-The log files must be parsed
+The log files must be parsed into JSON
 
-    ./up
+    ./update-dbs-from-txt.sh
+
+Extract the tags from each file
+
+    node extract-tags.js
+    node export-all-tags.js
