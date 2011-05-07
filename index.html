@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link href="style.css" rel="stylesheet" type="text/css" media="screen">
+    <script src="https://ajax.googleapis.com/ajax/libs/mootools/1.3.1/mootools-yui-compressed.js"></script>
+    <script>
+      var data, keys, json, xhr = new XMLHttpRequest();
+
+      xhr.onreadystatechange = function () { 
+        if (4 !== xhr.readyState) {
+          return;
+        }
+        console.log('heya');
+        json = xhr.responseText;
+        data = JSON.parse(json);
+        keys = Object.keys(data);
+      };
+
+      xhr.open('get', '/db-all-unique.json', true);
+
+      xhr.send();
+
+      var MB_TITLES = 0
+        , MB_PATHS = 1;
+
+      function search(pattern) {
+        var results = [];
+
+        function find(key) {
+          var item = data[key]
+            , path = item[MB_PATHS].join('/') + '/' + item[MB_TITLES].join('/');
+
+          if (path.match(pattern)) {
+            results.push([ '', key, path]);
+          }
+        }
+
+        keys.forEach(find);
+
+        return results;
+      }
+
+    </script>
+  </head>
+  <body>
+    <div id='content'>
+      <input id="search" type="text" /><input id="submit" type="button" value="Search" />
+      Results: <code><pre id='results'></pre></code>
+    </div>
+  </body>
+  <script>
+    function pathFromMd5sum(md5sum) {
+      var md5split = [  
+          '/db',
+          md5sum.substr(0,3),
+          /*
+          md5sum.substr(0,2),
+          md5sum.substr(2,2),
+          md5sum.substr(4,2),
+          md5sum.substr(6,2),
+          md5sum.substr(8,4),
+          md5sum.substr(12,4),
+          md5sum.substr(16,8),
+          md5sum.substr(24,8),
+          */
+          md5sum
+        ];
+      return md5split.join('/');
+    }
+
+    function extname(path) {
+      var p = path.lastIndexOf('.');
+      if (p > 0) {
+        return path.substr(p);
+      }
+      return '';
+    }
+
+    function basename(path, ext) {
+      var b = path.lastIndexOf('/') + 1
+        , e = path.lastIndexOf(ext || '.');
+
+      return path.substr(b, e - b);
+    }
+
+    function mimetype(ext) {
+      if (/mp3$/i.test(ext)) {
+        return 'audio/mpeg';
+      }
+    }
+
+    function handleSearch() {
+      $('results').innerHTML = '';
+      var pattern = new RegExp($('search').value, 'i')
+        , results = search(pattern)
+        , html = [];
+
+      results.sort(function (a, b) {
+        if (basename(a[2]) > basename(b[2])) {
+          return 1;
+        }
+        if (basename(a[2]) < basename(b[2])) {
+          return -1;
+        }
+        return 0;
+      });
+      results.forEach(function (item) {
+        var md5sum = item[1]
+          , resource = pathFromMd5sum(md5sum) + extname(item[2]);
+
+        html.push("" + 
+          "<audio preload='none' controls><source src='" + resource + "' /></audio> " + 
+          "<a href='" + resource + "'>[Cache Locally]</a>   " + 
+          basename(item[2]) + ' [' + extname(item[2]).substr(1) + '] ' + 
+          "\n");
+      });
+      $('results').innerHTML = html.join('\n');
+    }
+
+    $('submit').addEvent('click', handleSearch);
+  </script>
+</html>
