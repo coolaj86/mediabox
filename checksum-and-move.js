@@ -62,7 +62,7 @@
         // XXX this is a completely safe assumption
         // but does not guarantee deduplication
         if (path.basename(newpath).toLowerCase() !== path.basename(filename).toLowerCase()) {
-          console.log(md5sum + ' - ' + filename); // this was missing
+          util.log(md5sum + ' - ' + filename); // this was missing
           fs.unlink(filename, errlog); // crap! 
         }
         return;
@@ -73,7 +73,7 @@
           util.debug(JSON.stringify(err));
           return;
         }
-        console.log(md5sum + ' - ' + filename);
+        util.log(md5sum + ' - ' + filename);
         fs.unlink(filename, errlog);
       });
     });

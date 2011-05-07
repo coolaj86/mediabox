@@ -12,11 +12,18 @@ Check the directory in `checksum-and-move.js` and all of your m4a and mp3 fills 
 
     ./checksum-and-move.sh
 
-The log files must be parsed into JSON
+    # /Users/coolaj86/Music/iTunes/ArtistX/AlbumY/TitleZ.m4a -> ./db/c4a/c4afce916bdf562b29247619d2ce8031.m4a
+
+Cuts the datestamp and sorts log files
 
     ./update-dbs-from-txt.sh
 
-Extract the tags from each file
+Extract the tags from each file and creates a `.json` in the same dir
 
     node extract-tags.js
+
+Puts all of the `.json` into a single file
+
+This is a post-step since the `.json` step may be interrupted or whatever
+
     node export-all-tags.js
