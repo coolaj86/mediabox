@@ -27,3 +27,10 @@ Puts all of the `.json` into a single file
 This is a post-step since the `.json` step may be interrupted or whatever
 
     node export-all-tags.js
+
+Notes
+====
+
+Storing files by mime type results in faster parsing for third-party apps.
+
+For example, storing the `.json` metatag files in the same dirs as the m4a and mp3s slows down iTunes processing significantly.
