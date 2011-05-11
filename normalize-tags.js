@@ -1,7 +1,10 @@
 (function () {
   "use strict";
 
+  var PATH_TAGS_JSON = 'md5-paths-map.json';
+
   var fs = require('fs')
+    , pathTags = JSON.parse(fs.readFileSync(PATH_TAGS_JSON))
     , empty = /^\s+$/
     , id3v1TagMap
     , id3v2TagMap
@@ -78,6 +81,8 @@
         reassoc(m4aTagMap, ctag, tag);
         ctag.extname = '.m4a';
       }
+
+      ctag.pathTags = pathTags[ctag.fileMd5sum];
 
       ctags.push(ctag);
     });

@@ -28,6 +28,31 @@ This is a post-step since the `.json` step may be interrupted or whatever
 
     node export-all-tags.js
 
+Normalized Tags
+====
+
+http://gumstix.coolaj86.info:3000/normalized-tags.json
+
+All of the tags - id3v1, id3v2, and m4a have been reduced to just a few tags:
+
+  * `title`
+  * `artist`
+  * `album_artist`
+  * `album`
+  * `track`
+  * `genre`
+  * `release_date`
+  compilation - (if part of something like Now, Totally Hits, etc)
+
+However, the fields have not been normalized (`release_date` on id3v1 is just the year; `track` for m4a is "x of y")
+
+Additionally, these tags also exist:
+
+  * pathTags - an array of the original paths of where files of that md5sum have been found
+  * fileMd5sum - the md5sum of the file, the current location of the stream
+  * extname - .m4a or .mp3
+  * streamMd5sum - the contents of the raw stream, not including file or tag metadata
+
 Notes
 ====
 
