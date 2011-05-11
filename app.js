@@ -63,18 +63,6 @@
     }
   }
 
-  // \n ﻿Atom \"©nam\" contains: Telemann: Tafelmusik Suite #1 In E Minor - 5. Passepied    "©ART": "Eugen Duvier: Camerata Romana",
-  function fixm4a(stdout) {
-    // WARN " can be part of a name (but very rare)
-    var m = stdout.match(/\\"(.*)\\" contains: (.*?)"(.*)"(.*)\n/);
-    // strip trailing whitespace as part of fix
-    m[2] = m[2].match(/(.*?)\s*$/)[1];
-                                                                                  //name            // attr
-    stdout = stdout.replace(/\\n.*?Atom.* \\"(.*)\\" contains: (.*?)"(.*)\n/, '"' + m[1] + '": "' + m[2] + '",\n "' + m[3] + '",\n');
-    stdout = JSON.parse(stdout);
-    return JSON.stringify(stdout, null, '  ');
-  }
-
   function getTags(req, res, next) {
     var resource = url.parse(req.url, true)
       , xyztags
@@ -103,9 +91,6 @@
     exec(xyztags + ' --literal ' + xyzargs + '.' + filepath, function (err, stdout, stderr) {
       if (err || stderr) {
         return res.end('file not found');
-      }
-      if (filepath.match(/.m4a/)) {
-        stdout = fixm4a(stdout);
       }
       res.end(stdout);
     });
