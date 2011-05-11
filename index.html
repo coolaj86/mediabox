@@ -4,7 +4,7 @@
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
     <script src="https://ajax.googleapis.com/ajax/libs/mootools/1.3.1/mootools-yui-compressed.js"></script>
     <script>
-      var data, keys, json, tags;
+      var pathnames, fileMd5Keys, json, tags;
 
       function getTagDb() {
         var xhr;
@@ -15,7 +15,7 @@
           if (4 !== xhr.readyState) {
             return;
           }
-          console.log('got tags');
+          console.log('saved global.tags');
           json = xhr.responseText;
           tags = JSON.parse(json);
         };
@@ -34,10 +34,10 @@
           if (4 !== xhr.readyState) {
             return;
           }
-          console.log('got paths');
+          console.log('saved global.pathnames and global.fileMd5Keys');
           json = xhr.responseText;
-          data = JSON.parse(json);
-          keys = Object.keys(data);
+          pathnames = JSON.parse(json);
+          fileMd5Keys = Object.keys(pathnames);
         };
 
         xhr.open('get', '/db-all-unique.json', true);
@@ -52,7 +52,7 @@
         var results = [];
 
         function find(key) {
-          var item = data[key]
+          var item = pathnames[key]
             , path = item[MB_PATHS].join('/') + '/' + item[MB_TITLES].join('/');
 
           if (path.match(pattern)) {
@@ -60,7 +60,7 @@
           }
         }
 
-        keys.forEach(find);
+        fileMd5Keys.forEach(find);
 
         return results;
       }
