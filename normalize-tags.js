@@ -76,7 +76,7 @@
         delete tag.ID3v2;
       } else {
         reassoc(m4aTagMap, ctag, tag);
-        ctag.type = '.m4a';
+        ctag.extname = '.m4a';
       }
 
       ctags.push(ctag);
