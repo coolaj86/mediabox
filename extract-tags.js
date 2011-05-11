@@ -11,32 +11,29 @@
     , count = 0
     , walker = walk.walk('./db');
 
-  function fixm4a(stdout, xyzjson) {
-    // WARN " can be part of a name (but very rare)
-    var m = stdout.match(/\\"(.*)\\" contains: (.*?)"(.*)"(.*)\n/);
-    if (!m) {
-      return stdout;
-    }
-    // strip trailing whitespace as part of fix
-    m[2] = m[2].match(/(.*?)\s*$/)[1];
-                                                                                  //name            // attr
-    stdout = stdout.replace(/\\n.*?Atom.* \\"(.*)\\" contains: (.*?)"(.*)\n/, '"' + m[1] + '": "' + m[2] + '",\n "' + m[3] + '",\n');
-    return stdout;
-  }
-
   function handleFile(root, stat, next) {
     var name = stat.name
       , extname = path.extname(name)
       , md5sum = name.substr(0, name.indexOf('.'))
       , md5pre = './db/' + md5sum.substr(0, 3)
       , xyztags
-      , xyzjson = md5pre + '/' + md5sum + '.json';
+      , xyzjson = path.join(md5pre, md5sum + extname + '.json');
 
-    if (/mp3$/.test(extname)) {
+    if (".mp3" === extname) {
       xyztags = 'id3tags';
-    } else {
+    } else if (".m4a" === extname) {
       xyztags = 'm4atags';
+    } else {
+      return next();
     }
+
+    // TODO BUG temporary shim to get only m4a's and delete old mp3 tags
+    /*
+    if (".m4a" !== extname && ".mp3" !== extname) {
+      //fs.unlink(path.join(md5pre, md5sum + '.json'));
+      return next();
+    }
+    */
 
     function saveTags(err, stdout, stderr) {
       var data;
@@ -45,10 +42,6 @@
         stderr = err && err.message || stderr;
         util.debug(xyzjson + ' ' + stderr);
         return next();
-      }
-
-      if (/m4a$/.test(extname)) {
-        stdout = fixm4a(stdout, xyzjson);
       }
 
       try {

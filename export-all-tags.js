@@ -24,9 +24,10 @@
         return next();
       }
 
-      console.log(filename);
+      //console.log(filename);
 
       data = JSON.parse(json);
+      data.fileMd5sum = stat.name.substr(0, stat.name.indexOf('.'));
       allTags.push(data);
 
       next();
@@ -36,7 +37,19 @@
   }
 
   function handleEnd() {
-    fs.writeFile('all-tags.json', JSON.stringify(allTags));
+    var first = true;
+    console.log('[');
+    allTags.forEach(function (item) {
+      var str = JSON.stringify(item);
+      if (!first) {
+        str = ',' + str;
+      } else {
+        first = false;
+      }
+      console.log(str);
+    });
+    console.log(']');
+    //fs.writeFile('all-tags.json', JSON.stringify(allTags));
   }
 
   walker.on('file', handleFile);

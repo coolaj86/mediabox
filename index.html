@@ -4,21 +4,46 @@
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
     <script src="https://ajax.googleapis.com/ajax/libs/mootools/1.3.1/mootools-yui-compressed.js"></script>
     <script>
-      var data, keys, json, xhr = new XMLHttpRequest();
+      var data, keys, json, tags;
 
-      xhr.onreadystatechange = function () { 
-        if (4 !== xhr.readyState) {
-          return;
-        }
-        console.log('heya');
-        json = xhr.responseText;
-        data = JSON.parse(json);
-        keys = Object.keys(data);
-      };
+      function getTagDb() {
+        var xhr;
 
-      xhr.open('get', '/db-all-unique.json', true);
+        xhr = new XMLHttpRequest();
 
-      xhr.send();
+        xhr.onreadystatechange = function () { 
+          if (4 !== xhr.readyState) {
+            return;
+          }
+          console.log('got tags');
+          json = xhr.responseText;
+          tags = JSON.parse(json);
+        };
+
+        xhr.open('get', '/all-tags.json', true);
+
+        xhr.send();
+      }
+
+      function getPathDb() {
+        var xhr;
+
+        xhr = new XMLHttpRequest();
+
+        xhr.onreadystatechange = function () { 
+          if (4 !== xhr.readyState) {
+            return;
+          }
+          console.log('got paths');
+          json = xhr.responseText;
+          data = JSON.parse(json);
+          keys = Object.keys(data);
+        };
+
+        xhr.open('get', '/db-all-unique.json', true);
+
+        xhr.send();
+      }
 
       var MB_TITLES = 0
         , MB_PATHS = 1;
@@ -40,6 +65,8 @@
         return results;
       }
 
+      getTagDb();
+      getPathDb();
     </script>
   </head>
   <body>

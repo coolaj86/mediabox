@@ -31,6 +31,12 @@ This is a post-step since the `.json` step may be interrupted or whatever
 Notes
 ====
 
+[Tags seen in the wild](https://gist.github.com/965870)
+
+[MusicBrainz correlation of common tags](http://musicbrainz.org/doc/MusicBrainz_Tag)
+
 Storing files by mime type results in faster parsing for third-party apps.
 
 For example, storing the `.json` metatag files in the same dirs as the m4a and mp3s slows down iTunes processing significantly.
+
+Some erroring m4a files may be fixable with `mp4file --optimize myfile.m4a # requires mp4v2 packafe` [issue #7](https://bitbucket.org/wez/atomicparsley/issue/7/im-getting-an-apar_readx_noseek-read)
