@@ -8,11 +8,21 @@ Nothing here for most folks to use. This is nothing of beta or even alpha qualit
 Instructions
 ====
 
-Check the directory in `checksum-and-move.js` and all of your m4a and mp3 fills will be moved to `./db`
+`checksum-and-move.js`:
 
-    ./checksum-and-move.sh
+Open the file and change the source and destination directories.
+
+By default your files remain untouched. Hard links to your files are created.
+If desired, uncomment the final `fs.unlink()` and the move will be made permament.
+
+Note: you should log the output!!!
+
+    ./checksum-and-move.js >> db-all.txt 2>> db-all.err
+
+Your files will be moved in this fashion:
 
     # /Users/coolaj86/Music/iTunes/ArtistX/AlbumY/TitleZ.m4a -> ./db/c4a/c4afce916bdf562b29247619d2ce8031.m4a
+
 
 Cuts the datestamp and sorts log files
 
