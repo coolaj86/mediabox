@@ -2,12 +2,23 @@
 <html>
   <head>
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
-    <script src="https://ajax.googleapis.com/ajax/libs/mootools/1.3.1/mootools-yui-compressed.js"></script>
+    <script src="javascripts/ender.js"></script>
     <script>
-      var pathnames, fileMd5Keys, json, tags;
+      "use strict";
+      function basename(path, ext) {
+        var b = path.lastIndexOf('/') + 1
+          , e = path.lastIndexOf(ext || '.');
+
+        return path.substr(b, e - b);
+      }
+    </script>
+    <script>
+      "use strict";
+
+      var tags;
 
       function getTagDb() {
-        var xhr;
+        var xhr, json;
 
         xhr = new XMLHttpRequest();
 
@@ -25,57 +36,75 @@
         xhr.send();
       }
 
-      function getPathDb() {
-        var xhr;
-
-        xhr = new XMLHttpRequest();
-
-        xhr.onreadystatechange = function () { 
-          if (4 !== xhr.readyState) {
-            return;
-          }
-          console.log('saved global.pathnames and global.fileMd5Keys');
-          json = xhr.responseText;
-          pathnames = JSON.parse(json);
-          fileMd5Keys = Object.keys(pathnames);
-        };
-
-        xhr.open('get', '/db-all-unique.json', true);
-
-        xhr.send();
-      }
-
       var MB_TITLES = 0
         , MB_PATHS = 1;
+
+      var searchable = [
+        "title",
+        "artist",
+        "album_artist",
+        "album"
+      ];
 
       function search(pattern) {
         var results = [];
 
-        function find(key) {
-          var item = pathnames[key]
-            , path = item[MB_PATHS].join('/') + '/' + item[MB_TITLES].join('/');
+        // TODO just give back the ids
+        function find(item) {
+          var hasMatch = false
+            , pathname = item.pathTags.join('/')
+            , title;
 
-          if (path.match(pattern)) {
-            results.push([ '', key, path]);
+          if (pathname.match(pattern)) {
+            hasMatch = true;
           }
+
+          searchable.forEach(function (key) {
+            if (item[key] && item[key].match(pattern)) {
+              hasMatch = true;
+            }
+          });
+
+          if (!hasMatch) {
+            return;
+          }
+
+          if (item.title && item.title.match(/\w+/)) {
+            var track = item.track && item.track.match(/\s*(\d+).*/)[1];
+            if (track) {
+              if (track.length < 2) {
+                track = '0' + track;
+              }
+              track += ' - ';
+            }
+            title = track + item.title + item.extname;
+          } else {
+            title = basename(item.pathTags[0]) + item.extname;
+          }
+
+          results.push([item.fileMd5sum, title, item]);
         }
 
-        fileMd5Keys.forEach(find);
+        tags.forEach(find);
 
         return results;
       }
 
       getTagDb();
-      getPathDb();
     </script>
   </head>
   <body>
     <div id='content'>
-      <input id="search" type="text" /><input id="submit" type="button" value="Search" />
+      <div id="playlist">
+      </div>
+      <form id="search" action='#fixme'>
+        <input id="query" type="text" /><input id="submit" type="submit" value="Search" />
+      </form>
       Results: <code><pre id='results'></pre></code>
     </div>
   </body>
   <script>
+    var g_results;
     function pathFromMd5sum(md5sum) {
       var md5split = [  
           '/db',
@@ -103,47 +132,83 @@
       return '';
     }
 
-    function basename(path, ext) {
-      var b = path.lastIndexOf('/') + 1
-        , e = path.lastIndexOf(ext || '.');
-
-      return path.substr(b, e - b);
-    }
-
     function mimetype(ext) {
       if (/mp3$/i.test(ext)) {
         return 'audio/mpeg';
       }
     }
 
-    function handleSearch() {
-      $('results').innerHTML = '';
-      var pattern = new RegExp($('search').value, 'i')
+    function handleSearch(ev) {
+      
+      console.log('handling search');
+      ev.preventDefault();
+
+      var MD5SUM = 0
+        , TITLE = 1; 
+
+      var query = $('#query').val()
+        , pattern = new RegExp(query, 'i')
         , results = search(pattern)
         , html = [];
 
+      g_results = results;
+
+      console.log(query);
+      $('#results').html('');
+
       results.sort(function (a, b) {
-        if (basename(a[2]) > basename(b[2])) {
+        if (basename(a[TITLE]) > basename(b[TITLE])) {
           return 1;
         }
-        if (basename(a[2]) < basename(b[2])) {
+        if (basename(a[TITLE]) < basename(b[TITLE])) {
           return -1;
         }
         return 0;
       });
+
       results.forEach(function (item) {
-        var md5sum = item[1]
-          , resource = pathFromMd5sum(md5sum) + extname(item[2]);
+        var md5sum = item[MD5SUM]
+          , resource = pathFromMd5sum(md5sum) + extname(item[TITLE]);
 
         html.push("" + 
-          "<audio preload='none' controls><source src='" + resource + "' /></audio> " + 
-          "<a href='" + resource + "'>[Cache Locally]</a>   " + 
-          basename(item[2]) + ' [' + extname(item[2]).substr(1) + '] ' + 
+          "<a class='audioitem' href='" + resource + "'>Add to playlist</a>   " + 
+          basename(item[TITLE]) + ' [' + extname(item[TITLE]).substr(1) + '] ' + 
+          "<a class='encache' href='" + resource + "'>[Cache Locally]</a>   " + 
           "\n");
       });
-      $('results').innerHTML = html.join('\n');
+
+      $('#results').html(html.join('\n'));
     }
 
-    $('submit').addEvent('click', handleSearch);
+    var playing = false;
+    function playNext() {
+      if (playing) {
+        return;
+      }
+      $('audio')[0].play();
+      $('audio')[0].addEventListener('ended', function (ev) {
+        console.log('mediaEvent', ev);
+        $($('audio')[0]).remove();
+        playing = false;
+        // TODO nextTick
+        playNext();
+      }, false);
+      playing = true;
+    }
+
+    function handleAddToPlayList(ev) {
+      ev.preventDefault();
+      console.log(ev.target);
+      console.log(ev.target.href);
+      var resource = $(ev.target).attr('href');
+      console.log('href', resource);
+      $("#playlist").append("" +
+        "<audio preload='none' controls><source src='" + resource + "' /></audio> " + 
+      "\n<br/>");
+      playNext();
+    }
+
+    $('body').delegate('form#search', 'submit', handleSearch);
+    $('body').delegate('a.audioitem', 'click', handleAddToPlayList);
   </script>
 </html>
