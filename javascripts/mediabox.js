@@ -6,9 +6,8 @@
 
         return path.substr(b, e - b);
       }
-}());
-(function () {
-      "use strict";
+
+
 
       var tags;
 
@@ -88,8 +87,8 @@
       }
 
       getTagDb();
-}());
-(function () {
+
+
   $.domReady(function () {
     var g_results;
     function pathFromMd5sum(md5sum) {
