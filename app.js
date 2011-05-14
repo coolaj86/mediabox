@@ -103,4 +103,12 @@
     connect.static('.'),
     getTags
   );
+  // backwards compat
+  connect.createServer(
+    connect.header,
+    suggestChrome,
+    addCors,
+    connect.static('.'),
+    getTags
+  ).listen(3000);
 }());
