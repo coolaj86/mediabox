@@ -27,14 +27,6 @@
       return next();
     }
 
-    // TODO BUG temporary shim to get only m4a's and delete old mp3 tags
-    /*
-    if (".m4a" !== extname && ".mp3" !== extname) {
-      //fs.unlink(path.join(md5pre, md5sum + '.json'));
-      return next();
-    }
-    */
-
     function saveTags(err, stdout, stderr) {
       var data;
 

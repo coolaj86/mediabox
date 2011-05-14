@@ -2,6 +2,7 @@
   "use strict";
 
   var MD5SUM_RE = /[a-z0-9]{32}/i;
+  var DB_ROOT = './db';
 
   var path = require('path')
     , fs = require('fs')

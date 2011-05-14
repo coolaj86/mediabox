@@ -2,6 +2,7 @@
   "use strict";
 
   var PATH_TAGS_JSON = 'md5-paths-map.json';
+  var TAGS_ALL_JSON = 'all-tags.json';
 
   var fs = require('fs')
     , pathTags = JSON.parse(fs.readFileSync(PATH_TAGS_JSON))
@@ -55,7 +56,7 @@
     });
   }
 
-  fs.readFile('all-tags.json', function (err, data) {
+  fs.readFile(TAGS_ALL_JSON, function (err, data) {
     var tags = JSON.parse(data);
 
     tags.forEach(function (tag) {
@@ -87,7 +88,19 @@
       ctags.push(ctag);
     });
 
-    console.log(JSON.stringify(ctags));
+    var first = true;
+    console.log('[');
+    ctags.forEach(function (ctag) {
+      var str;
+      if (first) {
+        str = '';
+        first = false;
+      } else {
+        str = ','
+      }
+      console.log(str + JSON.stringify(ctag));
+    });
+    console.log(']');
   });
 
 }());
