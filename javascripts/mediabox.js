@@ -137,18 +137,40 @@ var tags
           , aartist = atag.artist || ''
           , aalbum = atag.album || ''
           , atitle = atag.title || ''
+          , atrack = parseInt(atag.track || 0, 10)
           , btag = b[ITEM]
           , bartist = btag.artist || ''
           , balbum = btag.album || ''
+          , btrack = parseInt(btag.track || 0, 10)
           , btitle = btag.title || '';
 
-        if (aartist > bartist)
-        if (basename(a[TITLE]) > basename(b[TITLE])) {
-          return 1;
-        }
-        if (basename(a[TITLE]) < basename(b[TITLE])) {
-          return -1;
-        }
+        // 1 means greater
+        // we want to sort 0-9 a-z, so less is more in this case
+
+        if (aartist > bartist) { return -1; }
+        if (aartist < bartist) { return 1; }
+
+        if (aalbum > balbum) { return -1; }
+        if (aalbum < balbum) { return 1; }
+
+        if (atrack > btrack) { return 1; }
+        if (atrack < btrack) { return -1; }
+
+        if (atitle > btitle) { return -1; }
+        if (atitle < btitle) { return 1; }
+
+        /*
+        console.log('track: ', atrack, btrack);
+        console.log('title: ', atitle, btitle);
+        console.log('artist: ', aartist, bartist);
+        console.log('album: ', aalbum, balbum);
+        console.log(' ');
+        */
+
+        if (basename(a[TITLE]) > basename(b[TITLE])) { return 1; }
+        if (basename(a[TITLE]) < basename(b[TITLE])) { return -1; }
+
+        // this should be fairly unlikely
         return 0;
       });
 
@@ -162,6 +184,7 @@ var tags
           whattoshow = basename(item[TITLE]);
         }
 
+        // TODO move to a template
         html.push("" + 
           "<div class='resultitem' >" +
             "<a class='addaudioitem' href='" + resource + "'>[+]</a>   " + 
