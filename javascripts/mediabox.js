@@ -1,3 +1,4 @@
+var tags
 (function () {
   "use strict";
       function basename(path, ext) {
@@ -8,8 +9,6 @@
       }
 
 
-
-      var tags;
 
       function getTagDb() {
         var xhr, json;
@@ -179,7 +178,8 @@
       var resource = $(ev.target).attr('href');
       console.log('href', resource);
       $("#playlist").append("" +
-        "<audio preload='none' controls><source src='" + resource + "' /></audio> " + 
+        // if preload=none, can't auto-play
+        "<audio preload='metadata' controls><source src='" + resource + "' /></audio> " + 
       "\n<br/>");
       playNext();
     }
