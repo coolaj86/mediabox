@@ -179,12 +179,20 @@ var tags
 
 
 // playlist events
-    var playing = false;
+    function isPlaying() {
+      if ($('.playlistitem audio').length < 1) {
+        return false;
+      }
+      if (!$('.playlistitem audio')[0].ended && !$('.playlistitem audio')[0].paused) {
+        return true;
+      }
+      return false;
+    }
+    // TODO (audioEl.paused && audioEl.ended) isPlaying
 
     function onSongEnded(ev) {
       console.log('mediaEvent', ev);
       $($('.playlistitem')[0]).remove();
-      playing = false;
       // TODO nextTick
       playNext();
     }
@@ -194,10 +202,11 @@ var tags
 // TODO shuffle by default
 // TODO add next just seconds before the first ends
     function playNext() {
-      if (playing) {
+      if (isPlaying()) {
         return;
       }
       if (!$('audio') || !$('audio')[0]) {
+        console.log('no playlistitems, searching in results');
         // TODO get a better autoshuffle
         //return $($('a.addaudioitem')[next]).click();
         if ($('.resultitem') && $('.resultitem').length > 0) {
@@ -213,7 +222,15 @@ var tags
       $('audio')[0].play();
       $('audio')[0].addEventListener('ended', onSongEnded, false);
       $('audio')[0].addEventListener('error', onSongEnded, false);
-      playing = true;
+    }
+
+    function onPlayNext(ev) {
+      ev.preventDefault();
+      if ($('.playlistitem') && $('.playlistitem').length > 0) {
+        $($('.playlistitem')[0]).remove();
+        console.log('has playlistitems, removing the current one');
+      }
+      playNext();
     }
 
     function onPlayNow(ev) {
@@ -253,5 +270,6 @@ var tags
     $('body').delegate('form#search', 'webkitspeechchange', handleSearch);
     $('body').delegate('a.addaudioitem', 'click', onAddToPlaylist);
     $('body').delegate('a.playaudioitem', 'click', onPlayNow);
+    $('body').delegate('a.skiptonext', 'click', onPlayNext);
   });
 }());
