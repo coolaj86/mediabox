@@ -8,25 +8,15 @@ Nothing here for most folks to use. This is nothing of beta or even alpha qualit
 Instructions
 ====
 
-`checksum-and-move.js`:
-
-Open the file and change the source and destination directories.
-
-By default your files remain untouched. Hard links to your files are created.
-If desired, uncomment the final `fs.unlink()` and the move will be made permament.
-
-Note: you should log the output!!!
-
-    ./checksum-and-move.js >> db-all.txt 2>> db-all.err
-
-Your files will be moved in this fashion:
-
-    # /Users/coolaj86/Music/iTunes/ArtistX/AlbumY/TitleZ.m4a -> ./db/c4a/c4afce916bdf562b29247619d2ce8031.m4a
-
-
-Cuts the datestamp and sorts log files
-
-    ./update-dbs-from-txt.sh
+  0. Edit `config.js`
+  0. Run `node build.js /path/to/music`
+    * which in turn runs `checksum-and-move.js`
+      * which logs to `meta/transfer-log.txt` and `meta/transfer-log.err` by default
+      * the logs can reverse any action taken by the move
+    * files will be moved from their current directory to the `db` directory
+      * `/Users/coolaj86/Music/iTunes/ArtistX/AlbumY/TitleZ.m4a` -> `db/c4a/c4afce916bdf562b29247619d2ce8031.m4a`
+    * the log file will be copied and converted to a `JSON` format
+      * `update-dbs-from-txt.sh` handles this
 
 Extract the tags from each file and creates a `.json` in the same dir
 
