@@ -89,6 +89,7 @@ var tags
 
 
   $.domReady(function () {
+
     var g_results;
     function pathFromMd5sum(md5sum) {
       var md5split = [  
@@ -122,7 +123,7 @@ var tags
         , TITLE = 1
         , ITEM = 2; 
 
-      var query = $('#query').val()
+      var query = $('#search-library').val()
         , pattern = new RegExp(query, 'i')
         , results = search(pattern)
         , html = [];
@@ -130,7 +131,6 @@ var tags
       g_results = results;
 
       console.log(query);
-      $('#results').html('');
 
       results.sort(function (a, b) {
         var atag = a[ITEM]
@@ -174,8 +174,10 @@ var tags
         return 0;
       });
 
+      var resultItemRows = [];
       results.forEach(function (item) {
         var md5sum = item[MD5SUM]
+          , tag = item[ITEM]
           , resource = pathFromMd5sum(md5sum) + extname(item[TITLE]);
 
         var whattoshow = (item[ITEM].track || '').substr(0,2) + ' - ' + (item[ITEM].title || '') + ' - ' + (item[ITEM].artist || '');
@@ -184,19 +186,25 @@ var tags
           whattoshow = basename(item[TITLE]);
         }
 
-        // TODO move to a template
-        html.push("" + 
-          "<div class='resultitem' >" +
-            "<a class='addaudioitem' href='" + resource + "'>[+]</a>   " + 
-            "<a class='playaudioitem' href='" + resource + "'>[play now]</a>   " + 
-            whattoshow +
-            ' [' + extname(item[TITLE]).substr(1) + '] ' +
-            "<a class='encache' href='" + resource + "'>[Cache Locally]</a>   " + 
-          "</div>"
-        );
+        // TODO use PURE as template system
+        resultItemRows.push("" +
+          "<tr class='result'>" + 
+            "<td class='add'>" + 
+              "<a class='ui-action' href='" + resource + "'>[+]</a>   " + 
+            "</td>" +
+            "<td class='play'>" + 
+              "<a class='ui-action' href='" + resource + "'>[play now]</a>   " + 
+            "</td>" +
+            "<td class='title'>" + tag.title + "</td>" +
+            "<td class='artist'>" + tag.artist + "</td>" +
+            "<td class='album'>" + tag.album + "</td>" +
+            "</td>" +
+          "</tr>" +
+        "");
       });
 
       $('#results').html(html.join('\n'));
+      $('#search-results')[0].innerHTML = resultItemRows.join('\n');
     }
 
 
@@ -231,13 +239,13 @@ var tags
       if (!$('audio') || !$('audio')[0]) {
         console.log('no playlistitems, searching in results');
         // TODO get a better autoshuffle
-        //return $($('a.addaudioitem')[next]).click();
-        if ($('.resultitem') && $('.resultitem').length > 0) {
-          var next = Math.floor(Math.random() * $('.resultitem').length);
-          console.log('auto selecting from list at random', $($('a.addaudioitem')[next]));
+        if ($('#search-results .result') && $('#search-results .result').length > 0) {
+          var next = Math.floor(Math.random() * $('#search-results .result').length);
+          console.log('auto selecting from list at random', $($('#search-results .result .add .ui-action')[next]));
+          // prevent infinite recursion
           setTimeout(function () {
-            $($('.resultitem a.addaudioitem')[next]).click();
-            $($('.resultitem')[next]).remove();
+            $($('#search-results .result .add .ui-action')[next]).click();
+            $($('#search-results .result')[next]).remove();
           }, 10);
         }
         return;
@@ -253,7 +261,10 @@ var tags
         $($('.playlistitem')[0]).remove();
         console.log('has playlistitems, removing the current one');
       }
-      playNext();
+      // TODO
+      //if (isEnded()) {
+        playNext();
+      //}
     }
 
     function onPlayNow(ev) {
@@ -289,10 +300,11 @@ var tags
       playNext();
     }
 
+    $('body').delegate('form#search-library', 'submit', handleSearch);
     $('body').delegate('form#search', 'submit', handleSearch);
     $('body').delegate('form#search', 'webkitspeechchange', handleSearch);
-    $('body').delegate('a.addaudioitem', 'click', onAddToPlaylist);
-    $('body').delegate('a.playaudioitem', 'click', onPlayNow);
+    $('body').delegate('.add .ui-action', 'click', onAddToPlaylist);
+    $('body').delegate('.play .ui-action', 'click', onPlayNow);
     $('body').delegate('a.skiptonext', 'click', onPlayNext);
   });
 }());

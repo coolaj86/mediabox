@@ -4,8 +4,10 @@
   var MD5SUM_RE = /[a-z0-9]{32}/i;
   var DB_ROOT = './db';
 
-  var path = require('path')
+  var config = require('./config')
+    , path = require('path')
     , fs = require('fs')
+    , fwStream = fs.createWriteStream(config.aggregatedTagsJson, 'w')
     , walk = require('walk')
     , walker = walk.walk('./db')
     , allTags = [];

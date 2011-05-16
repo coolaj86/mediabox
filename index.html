@@ -4,6 +4,7 @@
     <link href="style.css" rel="stylesheet" type="text/css" media="screen">
     <script src="javascripts/ender.js"></script>
     <script src="javascripts/remove-accents.js"></script>
+    <script src="javascripts/asciify.js"></script>
     <script src="javascripts/mediabox.js"></script>
   </head>
   <body>
@@ -13,10 +14,46 @@
       </div>
       <a class='skiptonext' href="#next-fixme">[Skip to Next]</a>
       <form id="search" action='#fixme'>
-        <input id="query" type="text" x-webkit-speech />
-        <input id="submit" type="submit" value="Search" />
+      Upload to Library (TODO): <input type="file" multiple />
+      <br/>
+      Search Library (Sub-searches don't work yet) <input id="search-library" x-webkit-speech />
+      <input id="submit" type="submit" value="Search" />
+      <table id='library'>
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>Title <input id='search-titles' type='text' x-webkit-speech /></th>
+            <th>Artist <input id='search-artists' type='text' x-webkit-speech /></th>
+            <th>Album <input id='search-albums' type='text' x-webkit-speech /></th>
+          </tr>
+        </thead>
+        <tbody id='search-results'>
+          <tr class='search-result-item'>
+            <td class='add'></td>
+            <td class='play'></td>
+            <td class='track'></td>
+            <td class='title'></td>
+            <td class='artist'></td>
+            <td class='album'></td>
+          </tr>
+        </tbody>
+      </table>
       </form>
-      Results: <code><pre id='results'></pre></code>
+      <pre>
+Thoughts on Albums
+  * no one ever searchs by album.... ever
+  * people do search by compilation (Now! 24, Christmas in Motown, Hercules Soundtrack, etc)
+  * in the post-cd era few people have 50+ tracks of the same artist (except The Beatles, Weezer, Taylor Swift and a handful of others)
+  * how is it possible to determine if a track in on a compilation?
+  * should compilations be sorted as artists and albums be dropped?
+
+Thoughts on Shuffle
+  * shuffle should be on by default
+  * low-rated songs should not appear in shuffle
+  * seasonal items should not appear in shuffle
+
+      </pre>
     </div>
   </body>
 </html>
