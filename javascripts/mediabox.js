@@ -7,6 +7,10 @@ var tags
 
         return path.substr(b, e - b);
       }
+      function dirname(path) {
+        var b = path.lastIndexOf('/');
+        return path.substr(0, b);
+      }
 
 
 
@@ -187,6 +191,19 @@ var tags
         }
 
         // TODO use PURE as template system
+        if (!tag.title) {
+          tag.title = basename(tag.pathTags[0]);
+        }
+        if (!tag.artist) {
+          tag.artist = dirname(tag.pathTags[0]);
+          tag.artist = tag.artist.split('/');
+          tag.artist = tag.artist[tag.artist.length - 2];
+        }
+        if (!tag.album) {
+          tag.album = dirname(tag.pathTags[0]);
+          tag.album = tag.album.split('/');
+          tag.album = tag.album[tag.album.length - 1];
+        }
         resultItemRows.push("" +
           "<tr class='result'>" + 
             "<td class='add'>" + 
