@@ -175,26 +175,7 @@
         fs.link(fullpath, tmppath, copyIfLinkingFailed);
       }
 
-      function getStats(e, stats) {
-        if (e) {
-          console.error('[ERROR] cannot stat ' + fullpath, e.message);
-          console.error(e.stack);
-          cb(e);
-          return;
-        }
-        
-        fileStats = stats;
-        // is this right?
-        fileStats.filepath = fullpath.substr(0, fullpath.lastIndexOf('/'));
-        fileStats.name = fullpath.substr(fullpath.lastIndexOf('/') + 1);
-        copyAndChecksum();
-      }
-
-      if (!fileStats) {
-        fs.lstat(fullpath, getStats);
-      } else {
-        copyAndChecksum();
-      }
+      copyAndChecksum();
     }
 
     populateDbRoot(dbroot);
