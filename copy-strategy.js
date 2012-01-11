@@ -6,6 +6,8 @@
     , crypto = require('crypto')
     ;
 
+  // TODO occasionally clear out /tmp?
+
   // TODO also make tmproot
   function populateDbRoot(dbroot) {
     var hexchars = "0123456789abcef"
@@ -56,32 +58,21 @@
         , writeStream
         , checksum
         , tmppath
+        , newpath
         ;
 
       function move() {
-        var newpath
-          , newname
-          ;
-         
-        newpath = dbroot + '/' + fileStats.md5sum.substr(0, 3) + '/' + fileStats.md5sum;
-        if (-1 !== fileStats.name.indexOf('.')) {
-          fileStats.ext = fileStats.name.substr(fileStats.name.lastIndexOf('.') + 1);
-          newpath += '.' + fileStats.ext;
-        }
-
         fs.rename(tmppath, newpath, function (err) {
           if (err) {
             console.error('[ERROR] cannot create link ' + tmppath + ' -> ' + newpath + ': ' + err.message);
             console.error(err.stack);
           }
 
+          // TODO check return value?
+          fs.unlink(tmppath);
+
           cb(err, fileStats);
         });
-      }
-
-      function getChecksums() {
-          ;
-
       }
 
       function copyAndChecksum() {
@@ -99,6 +90,17 @@
             , firstRun = true
             ;
 
+          function getHashPath() {
+            var newname
+              ;
+             
+            newpath = dbroot + '/' + fileStats.md5sum.substr(0, 3) + '/' + fileStats.md5sum;
+            if (-1 !== fileStats.name.indexOf('.')) {
+              fileStats.ext = fileStats.name.substr(fileStats.name.lastIndexOf('.') + 1);
+              newpath += '.' + fileStats.ext;
+            }
+          }
+
           function preHash() {
             hashStream = fs.createReadStream(fullpath)
             hashStream.on('data', function (chunk) {
@@ -108,20 +110,33 @@
             hashStream.on('end', function () {
               fileStats.md5sum = hash.digest('hex');
 
+              checkIfExists();
+            });
+          }
+
+          function checkIfExists() {
+            getHashPath();
+
+            if (!fileStats.md5sum) {
               writeIfNotExists();
+              return;
+            }
+
+            fs.lstat(newpath, function (err, stat) {
+              if (err) {
+                writeIfNotExists();
+                return;
+              }
+              
+              fs.unlink(tmppath);
+              cb(null, fileStats);
             });
           }
 
           function writeIfNotExists() {
-            // TODO check if the file already exists
-            if (fileStats.md5sum) {
-              if (false /* fileExists */) {
-                cb();
-                return;
-              }
-            }
-
             readStream = fs.createReadStream(fullpath);
+
+            getHashPath();
 
             if (e) {
               // TODO use newpath if fileStats.md5sum
@@ -188,11 +203,4 @@
   }
 
   module.exports.create = create;
-
-  function gotErDone() {
-    console.log('All Done');
-  }
-
-  create()(gotErDone, './testroot/absolute/real');
-
 }());
