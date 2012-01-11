@@ -22,6 +22,9 @@
     ;
 
   function removeFile(cb, fullpath) {
+    // TODO
+    // move to file.bak, link newpath file, unlink file.bak
+    // if this is a symlink, nothing more needed
     fs.unlink(fullpath, function (err) {
       if (err) {
         console.warn('[WARN] could not remove symlink', err.message);
