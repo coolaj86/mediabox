@@ -8,9 +8,13 @@ echo 'hello world' > ./testroot/absolute/real
 echo 'goodbye cruel world' > ./testroot/absolute/goodbye.txt
 cd ./testroot/symbolic
   ln -s ../doesnt.exist ./broken
+  sleep 1
   touch /tmp/out-of-scope
+  sleep 1
   ln -s /tmp/out-of-scope out-of-scope
+  sleep 1
   ln -s ../absolute/real working.txt
+  sleep 1
   ln -s working.txt link-to-a-link
 cd -
 find testroot
