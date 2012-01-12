@@ -30,7 +30,7 @@
     }
 
     // TODO use fs.mkdir
-    exec("cd '" + dbroot + "'; mkdir -p " + paths.join(' '), function (err, stdout, stderr) {
+    exec("mkdir -p " + dbroot + " && cd '" + dbroot + "'&& mkdir -p " + paths.join(' '), function (err, stdout, stderr) {
       if (err) {
         console.error(err.message);
         console.error(err.stack)
