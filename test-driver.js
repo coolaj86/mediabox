@@ -33,7 +33,7 @@
           return;
         }
         console.log('finished for', '\n  ' + givenpath, '\n  ' + stat.md5sum, '\n  ' + stat.stathash);
-        console.log(stat);
+        //console.log(stat);
       }
 
       function saveMeta(e, fileStats) {
@@ -78,5 +78,9 @@
   // TODO move givenpath to fileStats.xyz
   var handleFile = create();
   handleFile('./testroot/absolute/real');
-  handleFile('./testroot/absolute/goodbye.txt');
+  //handleFile('./testroot/absolute/goodbye.txt');
+  ////handleFile('./testroot/symbolic/broken');
+  //handleFile('./testroot/symbolic/link-to-a-link');
+  ////handleFile('./testroot/symbolic/out-of-scope');
+  handleFile('./testroot/symbolic/working');
 }());
