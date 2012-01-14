@@ -4,6 +4,7 @@
     * Reversable
     * Non-destructive in the event of power-failure
     * motivates me to complete mediabox
+
  */
 (function () {
   "use strict";
@@ -11,20 +12,24 @@
   var Walk = require('walk')
     , fs = require('fs')
     , path = require('path')
-    , walker
-    , sizeLimit = 1024 * 1024 * 1024 // 1GB
-    , totalSize = 0
-    , rootpath
     , exec = require('child_process').exec
-    , relpath = path.normalize(process.argv[2] + '/')
-    , forEachSync = require('forEachSync')
+    , forEachAsync = require('forEachAsync')
+    , Store = require('./store-strategy')
+    , store = Store.create()
+    // could be arguments
+    , sizeLimit = 1024 * 1024 * 1024 // 1GB
+    , countLimit = 1000 // 1,000 files
+    , totalSize = 0
+    , totalCount = 0
+    , walker
+    , realroot
+    , relroot
+    // TODO test if read-only filesystem
     , realRemove = false
+    , rootDeviceId
     ;
 
   function removeFile(cb, fullpath) {
-    // TODO
-    // move to file.bak, link newpath file, unlink file.bak
-    // if this is a symlink, nothing more needed
     fs.unlink(fullpath, function (err) {
       if (err) {
         console.warn('[WARN] could not remove symlink', err.message);
@@ -34,131 +39,225 @@
     });
   }
 
-  function syncAndRemoveOriginals(cb, toRemove) {
-    function removeOriginalsIfSyncSucceeded(err, stdout, stderr) {
-        var path
-          ;
-
-        if (err) {
-          console.error('[ERROR] How the heck can `sync` fail?', err.message);
-          console.error(err.stack);
-          return;
-        }
-
-        if (stderr) {
-          console.error('[ERROR] How the heck can `sync` have errors?', stderr);
-          return;
-        }
-
-        if (realRemove) {
-          forEachAsync(toRemove, removeFile).then(cb);
-        }
-      });
-    }
-
-    exec('sync', removeOriginalsIfSyncSucceeded);
-  }
-
-
-  function copySymLinks(cb) {
-    var symlinksToRemove = []
+  function relinkFile(cb, fileStats) {
+    // TODO path should be relative, root should be absolute
+    //var fullpath = fileStats.root + '/' + fileStats.path + '/' + fileStats.name
+    var fullpath = fileStats.path + '/' + fileStats.name
+      , bakfile = fullpath + '.mediabox-bak'
       ;
 
-    walker = Walk.walk(rootpath + '/' + relpath);
-    
-    walker.on('symbolicLink', function (root, fileStats, next) {
-      var sympath = root + '/' + fileStats.name
+    // no use in trying to hard link files on different devices
+    if (fileStats.dev !== rootDeviceId) {
+      console.log('different devices');
+      return cb();
+    }
+
+    // no need to hard link a soft link
+    if ('symbolicLink' === fileStats.type) {
+      return cb();
+    }
+
+    // TODO see if this is a read-only fs
+    /*
+    if (isReadOnly) {
+      return cb()
+    }
+    */
+
+    fs.rename(fullpath, bakfile, function (e) {
+      if (e) {
+        console.log('[rename failed]', e.message);
+        // TODO report some sort of error?
+        return cb();
+      }
+
+      console.log('[storepath]', fileStats.storepath);
+      fs.link(fileStats.storepath, fullpath, function (e) {
+        if (e) {
+          console.log('[link failed]', e.message);
+          fs.rename(bakfile, fullpath, function (e) {
+            if (e) {
+              console.error('[ERROR unrenaming]', fullpath, e.message);
+              console.error(e.stack);
+              return;
+            }
+          });
+        }
+
+        fs.unlink(bakfile, cb);
+      });
+    });
+  }
+
+  function sync(cb) {
+    exec('sync', function (err, stdout, stderr) {
+
+      if (err) {
+        console.error('[ERROR] How the heck can `sync` fail?', err.message);
+        console.error(err.stack);
+        return;
+      }
+
+      if (stderr) {
+        err = new Error(stderr);
+        console.error('[ERROR] How the heck can `sync` have errors?', stderr);
+        return;
+      }
+
+      cb(err || stderr);
+    });
+  }
+
+  function syncAndRemoveOriginals(cb, toRemove) {
+    function removeOriginalsIfSyncSucceeded(err) {
+      var path
+        , eachinate
         ;
 
-      fs.realpath(sympath, function (err, realpath) {
-        var relpath
-          , nextNext
-          ;
+      if (realRemove) {
+        eachinate = removeFile;
+      } else {
+        eachinate = relinkFile;
+      }
 
-        if (err) {
-          //console.error('[ERROR]', err.message);
+      forEachAsync(toRemove, eachinate).then(sync).then(cb);
+    }
+
+    sync(removeOriginalsIfSyncSucceeded);
+  }
+
+  function moveNodes(cb, eventName) {
+    var nodesToRemove = []
+      ;
+
+    function copyHelper(root, fileStats, next) {
+      // TODO ensure that root is relative
+      var fullpath = root + '/' + fileStats.name
+        , relpath = root
+        ;
+
+      function enqueForRemoval() {
+        fileStats.root = realroot;
+        fileStats.path = relpath;
+        // fileStats.name
+        // fileStats.ext
+
+        nodesToRemove.push(fileStats);
+
+        if (totalSize < sizeLimit && totalCount < countLimit) {
           next();
           return;
         }
 
-        if (rootpath !== realpath.substr(0, rootpath.length)) {
+        syncAndRemoveOriginals(function () {
+          nodesToRemove = [];
+          totalSize = 0;
+          totalCount = 0;
+          next();
+        }, nodesToRemove);
+      }
+
+      function copyIfRealpathIsInScope(realpath) {
+
+        if (realroot !== realpath.substr(0, realroot.length)) {
           //console.log('[IGNORE] link outside of scope:', realpath);
           next();
           return;
         }
 
-        relpath = realpath.substr(rootpath.length + 1);
-        console.log(path.resolve(sympath), '->', relpath + relpath);
-
-
-        fileStats.pathname = relpath;
-
         totalSize += fileStats.size;
-        console.log(fileStats);
+        totalCount += 1;
+        // TODO check that `dbroot` has enough space first
+        store(enqueForRemoval, realpath, fileStats);
+      }
 
-        function enqueForRemoval() {
-          symlinksToRemove.push(sympath);
-
-          if (totalSize < sizeLimit) {
+      function resolveRealpath() {
+        fs.realpath(fullpath, function (err, realpath) {
+          if (err) {
+            // ignore broken links
             next();
             return;
           }
 
-          syncAndRemoveOriginals(function () {
-            symlinksToRemove = [];
-            totalSize = 0;
-            next();
-          }, symlinksToRemove);
-        }
+          fs.lstat(realpath, function (e, stat) {
+            if (err) {
+              // probably a broken link
+              next();
+              return;
+            }
 
-        // TODO check that `dbroot` has enough space first
-        copyFile(enqueForRemoval, realpath);
-      });
-    });
+            // realpath will not be a symlink
+            // ignore blocks, directories, etc
+            if (!stat.isFile()) {
+              next();
+              return;
+            }
 
-    walker.on('end', function () {
-      console.log('Copied symlinks');
+            copyIfRealpathIsInScope(realpath, stat);
+          });
+        });
+      }
 
-      syncAndRemoveOriginals(function () {
-        symlinksToRemove = [];
-        totalSize = 0;
-        next();
-      }, symlinksToRemove);
+      if (fileStats.isFile()) {
+        copyIfRealpathIsInScope(fullpath);
+        return;
+      }
 
-      cb && cb();
-    });
-  }
-
-  function moveRealFiles(next) {
-    walker = Walk.walk(rootpath + '/' + relpath);
-
-    walker.on('file', function (root, fileStats, next) {
-      //console.log('');
-      //console.log(root + '/' + fileStats.name);
-
-      next();
-    });
-
-    walker.on('end', function () {
-      console.log('Moved Realfiles');
-      next && next();
-    });
-  }
-
-  if ('./' === relpath) {
-    relpath = '';
-  }
-
-  fs.realpath(path.resolve(process.cwd(), relpath), function (err, pathname) {
-    if (err) {
-      console.error('[ERROR]', err.message);
-      return;
+      // is a symlink
+      resolveRealpath();
     }
 
-    rootpath = pathname;
+    function syncAndEnd() {
+      console.log('Copied ', (eventName || 'file') + 's');
 
-    console.log('root:', rootpath);
-    copySymLinks();
-  });
+      syncAndRemoveOriginals(function () {
+        nodesToRemove = [];
+        totalSize = 0;
+        cb();
+      }, nodesToRemove);
+    }
 
+    walker = Walk.walk(realroot);
+    walker.on(eventName || 'file', copyHelper);
+    walker.on('end', syncAndEnd);
+  }
+
+  function getTargetDeviceId(e, stat) {
+
+    if (e) {
+      console.error('[realroot ERROR]', err.message);
+      console.error(e.stack);
+      return;
+    }
+    
+    rootDeviceId = stat.dev; 
+
+    console.log('root:', realroot);
+    moveNodes(function () {
+      moveNodes(function () {
+        console.log('Done');
+      })
+    }, 'symbolicLink');
+  }
+
+  function init(_relroot) {
+
+    relroot = _relroot;
+    if ('./' === relroot) {
+      relroot = '';
+    }
+
+    fs.realpath(path.resolve(process.cwd(), relroot), function (e, _realroot) {
+      if (e) {
+        console.error('[realroot ERROR]', e.message);
+        console.error(e.stack);
+        return;
+      }
+
+      realroot = _realroot;
+      fs.lstat(realroot, getTargetDeviceId);
+    });
+  }
+
+  init(path.normalize(process.argv[2] + '/'));
 }());

@@ -22,7 +22,7 @@
       ;
 
     // TODO move givenpath to fileStats.xyz
-    function handleFile(_givenpath) {
+    function storeFile(cb, _givenpath, fileStats) {
       var givenpath
         , metapath
         ;
@@ -35,6 +35,7 @@
         }
         console.log('finished for', '\n  ' + givenpath, '\n  ' + stat.md5sum, '\n  ' + stat.stathash);
         //console.log(stat);
+        cb();
       }
 
       function saveMeta(e, fileStats) {
@@ -70,10 +71,13 @@
       }
 
       givenpath = _givenpath;
-      fs.lstat(givenpath, getStats);
+      if (!fileStats) {
+        fs.lstat(givenpath, getStats);
+      }
+      copy(saveMeta, givenpath, fileStats);
     }
 
-    return handleFile;
+    return storeFile;
   }
 
   module.exports.create = create;

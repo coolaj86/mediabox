@@ -15,7 +15,9 @@ cd ./testroot/symbolic
   sleep 1
   ln -s ../absolute/real working.txt
   sleep 1
-  rsync ../absolute/real ../absolute/real.duplicate
+  rsync ../absolute/real ../absolute/real.copy
+  sleep 1
+  rsync ../absolute/real ../absolute/duplicate
   sleep 1
   ln -s working.txt link-to-a-link
 cd -

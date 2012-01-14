@@ -62,16 +62,34 @@
         ;
 
       function move() {
-        fs.rename(tmppath, newpath, function (err) {
+        fs.rename(tmppath, fileStats.storepath, function (err) {
           if (err) {
-            console.error('[ERROR] cannot create link ' + tmppath + ' -> ' + newpath + ': ' + err.message);
+            console.error('[ERROR] cannot create link ' + tmppath + ' -> ' + fileStats.storepath + ': ' + err.message);
             console.error(err.stack);
+
+            // TODO check return value?
+            fs.unlink(tmppath);
+            cb(err, fileStats);
+            return;
           }
 
-          // TODO check return value?
-          fs.unlink(tmppath);
+          if (newpath === fileStats.storepath) {
+            // TODO check return value?
+            fs.unlink(tmppath);
+            cb(null, fileStats);
+            return;
+          }
 
-          cb(err, fileStats);
+          fs.symlink(fileStats.md5sum, newpath, function (e) {
+            if (e) {
+              console.error('[ERROR] cannot create symlink ' + fileStats.storepath + ' -> ' + newpath + ': ' + err.message);
+              console.error(err.stack);
+            }
+
+            // TODO check return value?
+            fs.unlink(tmppath);
+            cb(e, fileStats);
+          });
         });
       }
 
@@ -95,9 +113,11 @@
               ;
              
             newpath = dbroot + '/' + fileStats.md5sum.substr(0, 3) + '/' + fileStats.md5sum;
+            fileStats.storepath = newpath;
+
             if (-1 !== fileStats.name.indexOf('.')) {
-              fileStats.ext = fileStats.name.substr(fileStats.name.lastIndexOf('.') + 1);
-              newpath += '.' + fileStats.ext;
+              fileStats.ext = fileStats.name.substr(fileStats.name.lastIndexOf('.'));
+              newpath += fileStats.ext;
             }
           }
 
@@ -125,7 +145,7 @@
             // XXX BUG TODO
             // what if there is a power failure in the middle
             // of a large write?
-            fs.lstat(newpath, function (err, stat) {
+            fs.lstat(fileStats.storepath, function (err, stat) {
               // if the checksums are the same but the sizes
               // mismatch, then perhaps there was a power failure
               if (err || fileStats.size !== stat.size) {
@@ -133,8 +153,28 @@
                 return;
               }
               
-              fs.unlink(tmppath);
-              cb(null, fileStats);
+              // preserve extensions as soft links (rsync-safe)
+              fs.lstat(newpath, function (e) {
+                // this extension already exists
+                if (!e) {
+                  fs.unlink(tmppath);
+                  cb(null, fileStats);
+                  return;
+                }
+
+                // this extension doesn't exist yet
+                // give relative path in same directory
+                fs.symlink(fileStats.md5sum, newpath, function (e) {
+                  if (e) {
+                    console.error('[ERROR] link failed', e.message);
+                    console.error(e.stack);
+                    return;
+                  }
+
+                  fs.unlink(tmppath);
+                  cb(null, fileStats);
+                })
+              });
             });
           }
 
