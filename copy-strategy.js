@@ -122,8 +122,13 @@
               return;
             }
 
+            // XXX BUG TODO
+            // what if there is a power failure in the middle
+            // of a large write?
             fs.lstat(newpath, function (err, stat) {
-              if (err) {
+              // if the checksums are the same but the sizes
+              // mismatch, then perhaps there was a power failure
+              if (err || fileStats.size !== stat.size) {
                 writeIfNotExists();
                 return;
               }
@@ -140,6 +145,7 @@
 
             if (e) {
               // TODO use newpath if fileStats.md5sum
+              // TODO listen to error events on writes
               writeStream = readStream.pipe(fs.createWriteStream(tmppath));
             }
 
