@@ -5,8 +5,8 @@ Object Representation:
 
     {
         "uuid": "0123-4567-89ab-cdef"
-      , "pathroot": "/mnt/wd-500gb"
-      , "pathname": "old-files/backup/"
+      , "root": "/mnt/wd-500gb"
+      , "path": "old-files/backup/"
       , "name": "resume"
       , "ext": ".pdf"
       , "symlink": true
