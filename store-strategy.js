@@ -21,6 +21,7 @@
       , metaStore = Meta.create()
       ;
 
+    // TODO move givenpath to fileStats.xyz
     function handleFile(_givenpath) {
       var givenpath
         , metapath
@@ -75,12 +76,5 @@
     return handleFile;
   }
 
-  // TODO move givenpath to fileStats.xyz
-  var handleFile = create();
-  handleFile('./testroot/absolute/real');
-  //handleFile('./testroot/absolute/goodbye.txt');
-  ////handleFile('./testroot/symbolic/broken');
-  //handleFile('./testroot/symbolic/link-to-a-link');
-  ////handleFile('./testroot/symbolic/out-of-scope');
-  handleFile('./testroot/symbolic/working');
+  module.exports.create = create;
 }());
