@@ -1,3 +1,36 @@
+Usage (for alpha testing)
+===
+
+    git clone git://github.com/coolaj86/mediabox.git MediaBox
+    cd MediaBox
+    git checkout modularized
+    ./create-testroot.sh
+    node move-files ./testroot
+
+Expected Behavior
+
+The files in `testroot/` will be moved to `testdb/` according to md5sum.
+
+If a file already exists with the name of that md5sum, but the size does not match,
+it is assumed that the existing file is the result of a partial write prior
+to the program being `SIGINT`d, or a power-failure and the existing file is overwritten.
+
+Note: In the astronomically rare case of a "birthday problem" collision
+(attack, random happenstance, memory corruption), there is no safegaurd.
+
+If the file is on the same device, a hard-link will be preferred to that of a copy.
+
+If this is the first run, the files will be checksummed before they are copied.
+Otherwise, they are checksummed during the copy.
+
+Note: In the case that writes happen very fast, this behavior is non-optimal 
+- the checksumming should occur during the copy.
+
+Metadata for each file and symlink is written into `testdb/`
+Original files are hard-linked (if on the same device) to the md5-named file in `testdb/`.
+Symlinks are left as-is.
+The file's extension is preserved with a symlink to the md5-named file.
+
 Stat Example
 ===
 
