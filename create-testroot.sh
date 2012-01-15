@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "This will take 7 seconds or so"
 rm -rf ./testroot
 mkdir -p ./testroot/absolute
 mkdir -p ./testroot/symbolic

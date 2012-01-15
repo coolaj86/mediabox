@@ -5,7 +5,7 @@ Usage (for alpha testing)
     cd MediaBox
     git checkout modularized
     ./create-testroot.sh
-    node move-files ./testroot
+    node ./app ./testroot
 
 Expected Behavior
 
@@ -71,6 +71,7 @@ Notes on `stat` objects in MediaBox
 
 fun stuff
 
+    ls -lah testroot/*/*
     ls -lah testdb/*/*
     rm testdb/*/*
 

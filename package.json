@@ -1,0 +1,24 @@
+{
+    "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info/)"
+  , "name": "MediaBox"
+  , "description": "Private Cloud (in home / office) Media management"
+  , "version": "0.0.10"
+  , "homepage": "http://getmediabox.com"
+  , "repository": {
+      "type": "git"
+    , "url": "git://github.com/coolaj86/mediabox.git"
+  }
+  , "main": "lib/index"
+  , "scripts": {
+      "test": "./run-tests.sh"
+  }
+  , "engines": {
+      "node": ">= 0.4"
+  }
+  , "dependencies": {
+      "node-uuid": "1.3.x"
+    , "forEachAsync": "2.1.x"
+    , "walk": "2.0.x"
+  }
+  , "devDependencies": {}
+}
