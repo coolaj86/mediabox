@@ -8,7 +8,9 @@
   function importPath() {
     // accepts file or directory
     //path.normalize(process.argv[2] + '/')
-    mediabox.import(scanpath);
+    mediabox.import(function () {
+      console.log('done');
+    }, scanpath);
   }
 
   mediabox.init(importPath);
