@@ -11,5 +11,5 @@
     mediabox.import(scanpath);
   }
 
-  mediabox.init(importPath, config);
+  mediabox.init(importPath);
 }());

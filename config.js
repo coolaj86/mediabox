@@ -6,7 +6,10 @@
 
   config = {
       dbroot: 'testdb/'
-    , tmproot: 'testdb/tmp'
+    //, tmproot: 'testdb/tmp'
+    //, filesroot: 'testdb/files'
+    //, metaroot: 'testdb/meta'
+    //, audioroot: 'testdb/audio'
     , remove: false
     , hardlink: true
     , softlink: false
