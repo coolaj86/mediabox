@@ -1,10 +1,12 @@
 #!/bin/bash
 
-echo "This will take 7 seconds or so"
+echo "Popullating './testroot' with files of various timestamps"
+echo "This will take 7 seconds or so (TODO: use 'touch' instead of 'sleep')"
 rm -rf ./testroot
 mkdir -p ./testroot/absolute
 mkdir -p ./testroot/symbolic
 
+rsync -a ./test-files/button-10.mp3 ./testroot/absolute/button-10.mp3
 echo 'hello world' > ./testroot/absolute/real
 echo 'goodbye cruel world' > ./testroot/absolute/goodbye.txt
 cd ./testroot/symbolic
