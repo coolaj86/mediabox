@@ -3,4 +3,7 @@ testdb
 testroot
 *.swp
 *.swo
+*.html
+*.css
 *~
+public/

@@ -1,0 +1,17 @@
+{
+  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info/)",
+  "name": "mediabox-browser-client",
+  "description": "A Browser-based Client to MediaBox",
+  "version": "0.0.1",
+  "homepage": "http://github.com/coolaj86/mediabox",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/coolaj86/mediabox.git"
+  },
+  "main": "lib/index",
+  "engines": {
+    "node": "~0.6.7"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
