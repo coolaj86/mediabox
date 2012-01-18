@@ -1,7 +1,7 @@
 (function () {
   var config = require('./config')
     , MediaBox = require('./lib')
-    , mediabox = MediaBox.create(config)
+    , mediabox
     , scanpath = process.argv[2]
     ;
 
@@ -12,6 +12,8 @@
       console.log('done');
     }, scanpath);
   }
+
+  mediabox = MediaBox.create(config);
 
   mediabox.init(importPath);
 }());
