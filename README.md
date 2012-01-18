@@ -83,3 +83,11 @@ Test Cases TODO
   * What if two files suffer from hash-collision?
     In such a case, the sizes would most likely be different.
   * What if a file system becomes read-only after a write error?
+
+Sample Files
+===
+
+  * http://support.apple.com/kb/ht1425
+  * http://www.kolonelschnapps.co.uk/sample-music
+  * http://billtmiller.com/mp3orgy/aac/cd/comp/14_obe_succubus_lp.m4a
+  * http://www.kolonelschnapps.co.uk/sample-music/02Track02sample.m4a?attredirects=0&d=1
