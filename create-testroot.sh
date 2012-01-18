@@ -6,7 +6,13 @@ rm -rf ./testroot
 mkdir -p ./testroot/absolute
 mkdir -p ./testroot/symbolic
 
-rsync -a ./test-files/button-10.mp3 ./testroot/absolute/button-10.mp3
+if [ ! -f "./test-files/sample.m4a" ]
+then
+  curl -L 'http://www.kolonelschnapps.co.uk/sample-music/02Track02sample.m4a?attredirects=0&d=1' \
+    -o ./test-files/sample.m4a
+fi
+rsync -a ./test-files/ ./testroot/absolute/
+#rsync -a ./test-files/button-10.mp3 ./testroot/absolute/button-10.mp3
 echo 'hello world' > ./testroot/absolute/real
 echo 'goodbye cruel world' > ./testroot/absolute/goodbye.txt
 cd ./testroot/symbolic
