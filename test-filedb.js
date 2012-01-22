@@ -5,7 +5,7 @@
     , audioDb = DB.create({ dbroot: 'testdb/audio' })
     ;
 
-  audioDb.update(function () {
-    console.log('updated');
+  audioDb.init(function () {
+    console.log('Initialized');
   });
 }());
