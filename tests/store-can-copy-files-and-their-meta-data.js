@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var Store = require('./store-strategy')
+  var Store = require('../store-strategy')
     , store
     , noop = function () {}
     ;

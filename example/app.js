@@ -1,6 +1,6 @@
 (function () {
   var config = require('./config')
-    , MediaBox = require('./lib')
+    , MediaBox = require('../lib')
     , mediabox
     , scanpath = process.argv[2]
     ;

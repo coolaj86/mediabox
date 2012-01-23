@@ -5,7 +5,7 @@
     ;
 
   config = {
-      dbroot: 'testdb/'
+      dbroot: '../tests/testdb/'
     //, tmproot: 'testdb/tmp'
     //, filesroot: 'testdb/files'
     //, metaroot: 'testdb/meta'
