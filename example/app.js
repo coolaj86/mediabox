@@ -23,6 +23,10 @@
     */
   }
 
+  if (!scanpath) {
+    console.error('no scanpath provided');
+  }
+
   mediabox = MediaBox.create(config);
 
   mediabox.init(importPath);
