@@ -12,6 +12,7 @@
     //, filesroot: 'testdb/files'
     //, metaroot: 'testdb/meta'
     //, audioroot: 'testdb/audio'
+    , automountDir: '../tests/automounts'
     , remove: false
     , hardlink: true
     , softlink: false
