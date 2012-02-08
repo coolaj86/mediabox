@@ -15,6 +15,7 @@
       }
       console.log('done');
     }, scanpath);
+    //mediabox.importOne();
     //*/
     /*
     console.log('big copy');
