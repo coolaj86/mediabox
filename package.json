@@ -23,6 +23,7 @@
     , "formaline": "0.6.x"
     , "connect-gzip": "0.1.x"
     , "mime": "1.x"
+    , "connect": "1.x"
   }
   , "devDependencies": {}
 }
