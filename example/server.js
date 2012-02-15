@@ -17,6 +17,7 @@
   function startServer(err) {
     console.info('Starting server...');
     server.listen(port, started);
+    // TODO import old db log
   }
 
   mediabox = MediaBox.create(config);
