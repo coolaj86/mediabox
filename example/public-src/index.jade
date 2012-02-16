@@ -3,5 +3,61 @@ html
   head
     title The Fradio - MediaBox
     script(src='pakmanaged.min.js')
+    link(href='style.css', rel='stylesheet', type='text/css', media='screen')
+    script(src='javascripts/ender.js')
+    script(src='javascripts/remove-accents.js')
+    script(src='javascripts/asciify.js')
+    script(src='javascripts/mediabox.js')
   body
     | Hello World! And welcome to MediaBox
+    #loading loading... (takes about a minute)
+    #content(style='display: none;')
+      #playlist
+      a.skiptonext(href='#next-fixme') [Skip to Next]
+      form#search(action='#fixme')
+        | Upload to Library (TODO):
+        input(type='file', multiple='multiple')
+        br
+        | Search Library (Sub-searches don't work yet)
+        input#search-library(x-webkit-speech='x-webkit-speech')
+        input#submit(type='submit', value='Search')
+        table#library
+          thead
+            tr
+              th  
+              th  
+              th
+                | Title
+                input#search-titles(type='text', x-webkit-speech='x-webkit-speech')
+              th
+                | Artist
+                input#search-artists(type='text', x-webkit-speech='x-webkit-speech')
+              th
+                | Album
+                input#search-albums(type='text', x-webkit-speech='x-webkit-speech')
+          tbody#search-results
+            tr.search-result-item
+              td.add
+              td.play
+              td.track
+              td.title
+              td.artist
+              td.album
+      pre.
+        \nThoughts on Albums
+          * no one ever searchs by album.... ever
+          * people do search by compilation (Now! 24, Christmas in Motown, Hercules Soundtrack, etc)
+          * in the post-cd era few people have 50+ tracks of the same artist (except The Beatles, Weezer, Taylor Swift and a handful of others)
+          * how is it possible to determine if a track in on a compilation?
+          * should compilations be sorted as artists and albums be dropped?
+        
+        Thoughts on Shuffle
+          * shuffle should be on by default
+          * low-rated songs should not appear in shuffle
+          * seasonal items should not appear in shuffle
+        
+        Thoughts on tagging
+          * indicate when a tag is unconfirmed
+          * indicate when multiple streams are available
+          * allow final merge (deletion) of duplicate tags, streams, and songs
+                      
