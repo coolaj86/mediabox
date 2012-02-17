@@ -1,4 +1,3 @@
-var removeDiacritics;
 (function () {
   "use strict";
   // http://stackoverflow.com/questions/286921/javascript-efficiently-replace-all-accented-characters-in-a-string
@@ -90,7 +89,8 @@ var removeDiacritics;
   ];
 
   var changes;
-  removeDiacritics = function (str) {
+
+  function removeAccents(str) {
       if(!changes) {
           changes = defaultDiacriticsRemovalMap;
       }
@@ -99,4 +99,6 @@ var removeDiacritics;
       }
       return str;
   }
+
+  module.exports = removeAccents;
 }());

@@ -1,6 +1,10 @@
 var tags
 (function () {
   "use strict";
+
+  var asciify = require('./asciify')
+    ;
+
       function basename(path, ext) {
         var b = path.lastIndexOf('/') + 1
           , e = path.lastIndexOf(ext || '.');

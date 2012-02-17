@@ -1,6 +1,8 @@
-var asciify;
 (function () {
   "use strict";
+
+  var removeAccents = require('./remove-accents')
+    ;
 
   // http://stackoverflow.com/questions/286921/javascript-efficiently-replace-all-accented-characters-in-a-string
   var diacriticReplacementMap = {} //require('./diacritics-replacement-map')
@@ -26,12 +28,12 @@ var asciify;
   }
   */
 
-  asciify = function (str) {
+  function asciify(str) {
     str = str.replace(punctuation, '')
              .replace(space, '');
 
     if (/\W/.test(str)) {
-      str = removeDiacritics(str);
+      str = removeAccents(str);
 
       // Probably a non-roman language
       // TODO use google translate to romanize unicode character sets
@@ -80,4 +82,5 @@ var asciify;
   exports.re_punctuation = punctuation;
   exports.re_smart_punctuation = smartpunctuation;
   */
+  module.exports = asciify;
 }());
