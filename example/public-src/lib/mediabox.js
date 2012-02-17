@@ -54,7 +54,7 @@ var tags
 
         // TODO just give back the ids
         function find(item) {
-          item.pathTags = item.pathTags || [];
+          item.pathTags = item.pathTags || [""];
           var hasMatch = false
             , pathname = item.pathTags.join('/')
             , title;
