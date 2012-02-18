@@ -9,12 +9,14 @@
     console.log('handledrag');
     //ev.stopPropagation();
     ev.preventDefault();
+    ev.stopPropagation();
   }
 
   function NewFileSelectOrDropHandler(callback) {
     function handleFileSelectOrDrop(ev) {
       console.log('1');
       ev.preventDefault();
+      ev.stopPropagation();
 
       var files = this.files || ev.dataTransfer && ev.dataTransfer.files
         ;

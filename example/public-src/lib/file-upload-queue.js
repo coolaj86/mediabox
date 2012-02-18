@@ -18,16 +18,28 @@
       ;
 
     // could optimize
-    function nextUpload(id, next) {
+    function nextUpload(session, id, next) {
       var emitter
         ;
 
       function cleanupUi(err, ahr, data) {
+        if (err) {
+          alert('error uploading data');
+          console.error(err);
+          return;
+        }
+
+        if (data.error || !data.result) {
+          alert('error uploading data');
+          console.error(data);
+          return;
+        }
+
         // TODO add new data to client db
 
         keys.forEach(function (key, i) {
-          var file = els[key]
-            , link = fileData[key].link
+          var file = files[key]
+            , link = els[key]
             ;
 
           // TODO move from progress to complete area
@@ -72,12 +84,36 @@
         console.log('progressEv', ev.loaded, ev.total);
       }
 
-      emitter = request.post('/api' + '/upload/' + id, null, formData);
+      emitter = request.post('/api' + '/upload/' + id, null, formData, { headers: { 'x-user-session': session } });
       emitter.upload.on('progress', updateProgress);
       emitter.when(cleanupUi);
     }
 
-    keys.forEach(function (key) {
+    function nextMeta(next) {
+      // TODO use a session
+      request.post('/api' + '/upload/new', null, metas).when(function (err, ahr, data) {
+        var id
+          ;
+        
+        if (err) {
+          alert('error with upload');
+          return;
+        }
+
+        if (data.error || !data.result) {
+          alert('different error with upload');
+          return;
+        }
+
+        id = data.result;
+        console.log('headers');
+        console.log(ahr.browserRequest.getAllResponseHeaders());
+        // TODO AHR2 should use getAllResponseHeaders to populate `headers`
+        nextUpload(ahr.browserRequest.getResponseHeader('x-user-session'), data.result, next);
+      }); 
+    }
+
+    function startUi(key) {
       var meta = metas[key]
         , link = els[key] = $(linkTpl)
         ;
@@ -94,24 +130,15 @@
 
       $('ul#uploadlist').prepend(link);
       formData.append(key, files[key]);
-    });
-
-    function nextMeta(next) {
-      // TODO use a session
-      request.post('/api' + '/upload/new', null, metas).when(function (err, ahr, data) {
-        var id = data.result
-          ;
-        
-        nextUpload(data.result, next);
-      }); 
     }
 
+    keys.forEach(startUi);
     sequence.then(nextMeta);
   }
 
   $.domReady(function () {
-    $('ul#uploadlist').html('');
     linkTpl = $('ul#uploadlist').html();
+    $('ul#uploadlist').html('');
   });
 
   module.exports.create = create;
