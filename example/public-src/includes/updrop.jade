@@ -1,0 +1,40 @@
+#drop.uiview.drop.index
+  #drop-container
+    header Drop
+    #dropzone.tall.file-zone.area.interactive
+      //- http://www.softicons.com/free-icons/web-icons/design-cartons-icons-by-sneh-roy/box-drag-and-drop-icon
+      img#drop-action-image(src='images/drag-n-drop-box.png',alt='Drag & Drop Files from your Desktop')
+      //- TODO find out why this is laggy when placed outside of #dropzone
+      form#upload.upload
+        //- webkitdirectory allows ONLY directories
+        //- input#filechooser.filechooser(name='file',type='file',multiple='multiple')
+    #uploadzone.short.file-zone.area.interactive
+      button#upload.button.gray Open File Browser
+      form.upload
+        //- input.filechooser(name='file',type='file',multiple='multiple')
+  #share-container
+    header Share
+    .short.area.interactive
+      //- http://www.iconseeker.com/search/SHARE/2
+      //-img(src='images/share-with-friends.png',style='width: 48px; display: inline;')
+      span.draw-attention Copy and Share these:
+    .tall.area.interactive
+      #no-links
+        | As you select files to share, the links will appear here.
+      //- TODO http://www.nikesh.me/demo/loading.html
+      //- http://jimpunk.net/Loading/?page_id=9
+      //-img#loading-large(src='images/loading-large.gif')
+      //- http://new.rogers.com/web/resources/images/wireless/loading.gif
+      //- http://images.wordpressapi.com/loading.gif
+      ul#uploadlist.tabs
+        li.tab.file-info
+          span.id TPL-TOKEN
+          span.name TPL-NAME
+          a(href='#/share/TPL-TOKEN') domain.tld/#/share/TPL-TOKEN
+          span.remove-file X
+          progress
+            span.val 0
+            span.div /
+            span.max 0
+  .clear
+  #delete-notice Files are deleted after 3 days.

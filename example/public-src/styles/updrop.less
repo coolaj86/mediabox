@@ -1,0 +1,190 @@
+@import "stylesheets/buttons";
+
+body {
+  background-image:url('images/always-grey.png');
+  text-align: center;
+  color: #999;
+  font-size: 14pt;
+}
+
+.uiview {
+  text-align: left;
+}
+
+#share.uiview {
+  text-align: center;
+}
+
+#api {
+  code {
+    font-family: monospace;
+    font-size: 12px;
+  }
+}
+
+#beta-banner {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+}
+
+header, h1, h2, h3, h4, h5, h6 {
+  font-family: 'Rammetto One', cursive;
+  color: ghostwhite;
+  text-shadow: 2px 2px 2px #000;
+  text-align: center;
+}
+
+header {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  font-size: 28pt;
+}
+
+#drop-action-image {
+  width: 196px;
+}
+
+.clear {
+  clear: both;
+}
+
+ul#uploadlist {
+  font-size: 12pt;
+
+  padding: 0;
+  margin-left: 0;
+  margin-top: 0;
+
+  li.file-info {
+    display: block;
+    padding: 0;
+    margin-left: 0;
+    text-decoration: none;
+    margin-left: 5px;
+    a {
+      /* text-shadow: 2px 2px 2px #000; */
+      font-weight: bold;
+      color: #4e7d0e;
+      margin: 3px;
+      padding: 3px;
+      border-radius: 3px;
+    }
+    a:hover {
+      color: #7db72f;
+    }
+  }
+}
+
+#delete-notice {
+  color: #414141;
+  background-color: yellow;
+  margin: auto;
+  width: 300px;
+  text-align: center;
+  border: 2px dashed red;
+  padding: 3px;
+}
+
+.center {
+  text-align: center;
+}
+
+#content {
+  margin: 0 auto;
+  width: 800px;
+  .draw-attention {
+    font-weight: bold;
+  }
+}
+
+.interactive {
+  color: #414141;
+  background-color: ghostwhite;
+  background-image: url('images/felt.png');
+}
+
+#app {
+  margin: 0 auto;
+  width: 640px;
+  border-radius: 15px;
+  /* border: 2px dashed red; */
+  background-color: rgba(0,0,0,0.3);
+  /* http://css-class.com/test/css/shadows/box-shadow-blur-offset-light.htm */
+  -webkit-box-shadow:0 0 1em hsla(0, 0%, 0%, 1.0);
+  -moz-box-shadow:0 0 1em hsla(0, 0%, 0%, 1.0);
+  box-shadow:0 0 1em hsla(0, 0%, 0%, 1.0);
+}
+
+#drop {
+  .short {
+    height: 20px;
+  }
+  .tall {
+    min-height: 200px;
+  }
+  .area {
+    width: 200px;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 5px;
+    border: 3px dashed #C11B17;
+  }
+  #drop-container {
+    float: left;
+    .file-zone {
+      cursor: pointer;
+    }
+  }
+  #share-container {
+    .tall.area.interactive {
+      overflow: visible;
+    }
+    float: left;
+    .id {
+      display: none;
+    }
+    .area {
+      width: 260px;
+    }
+  }
+}
+
+#draggable {
+  width: 20px;
+  height: 20px;
+  margin: 20px;
+  background-color: #fce;
+  padding: 20px;
+  border: 2px dashed #efc;
+  border-radius: 5px;
+  cursor: move;
+}
+
+
+  /* 
+    This snippet was stolen from min.us 
+    It looks like it gets the cursor icon to be
+    styleable in firefox
+  */
+.filechooser {
+  background-color: white;
+  position: absolute;
+  /* TODO fix margins and such*/
+  opacity: 0;
+  /* */
+  top: -1000px;
+  left: -1000px;
+  /* */
+  z-index: 1000000;
+  margin: -10px 0pt 0pt -179px;
+  height: 30px;
+  margin: -10px 0pt 0pt -179px;
+  cursor: pointer;
+}
+
+.tabs li {
+  display: inline;
+  margin: 10px;
+  padding: 10px;
+}
