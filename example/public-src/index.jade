@@ -3,11 +3,12 @@ html
   head
     title The Fradio - MediaBox
     link(href='style.css', rel='stylesheet', type='text/css', media='screen')
-    script(src='pakmanaged.min.js')
+    script(src='pakmanaged.js')
   body
     | Hello World! And welcome to MediaBox
     #loading loading... (takes about a minute)
-    #content(style='display: none;')
+    //-(style='display: none;')
+    #content
       #playlist
       a.skiptonext(href='#next-fixme') [Skip to Next]
       form#search(action='#fixme')
@@ -57,4 +58,4 @@ html
           * indicate when multiple streams are available
           * allow final merge (deletion) of duplicate tags, streams, and songs
 
-    include includes/updrop
+      include includes/updrop

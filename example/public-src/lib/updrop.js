@@ -11,13 +11,9 @@
     ev.preventDefault();
   }
 
-  function NewDropAreaWidget(callback, widgetRoot, dropEl) {
-    var parentDom = $(dropEl)
-      , chooser
-      , chooserClass
-      ;
-
+  function NewFileSelectOrDropHandler(callback) {
     function handleFileSelectOrDrop(ev) {
+      console.log('1');
       ev.preventDefault();
 
       var files = this.files || ev.dataTransfer && ev.dataTransfer.files
@@ -26,7 +22,20 @@
       callback.call(this, files, ev);
     }
 
+    return handleFileSelectOrDrop;
+  }
+
+  function NewDropAreaWidget(callback, widgetRoot, dropEl) {
+    var parentDom = $(dropEl)
+      , chooser
+      , chooserClass
+      , handleFileSelectOrDrop = NewFileSelectOrDropHandler(callback);
+      ;
+
+    console.log('updrop assigned');
+
     function onMouseMove(ev) {
+      console.log('2');
       // This calculation is done every time because
       // other elements on the page may have changed
       // i.e. a font may load after pageload or a list above may lengthen
@@ -53,6 +62,7 @@
     }
 
     function onMouseLeave(ev) {
+      console.log('3');
       chooser.css({ top: -1000, left: -1000 });
     }
 
@@ -67,7 +77,7 @@
       + ' multiple="multiple"'
       + ' style="'
         + ' position: absolute;'
-        + ' opacity: 0;'
+        + ' opacity: 0.5;'
         + ' top: -1000px;'
         + ' left: -1000px;'
         + ' z-index: 1000000;'
@@ -79,6 +89,7 @@
       + ' >')
       ;
 
+    console.log('5');
     $(dropEl).append(chooser);
 
     $(widgetRoot).delegate(dropEl + ' input.' + chooserClass, 'change', handleFileSelectOrDrop);
@@ -86,7 +97,10 @@
     $(widgetRoot).delegate(dropEl, 'drop', handleFileSelectOrDrop);
     $(widgetRoot).delegate(dropEl, 'mousemove', onMouseMove);
     $(widgetRoot).delegate(dropEl, 'mouseleave', onMouseLeave);
+    console.log('6');
   }
 
   module.exports.create = NewDropAreaWidget;
+  module.exports.abstract = NewFileSelectOrDropHandler;
+  module.exports.handleDrag = handleDrag;
 }());
