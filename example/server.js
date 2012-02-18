@@ -25,6 +25,7 @@
   server = connect.createServer(
       connect.favicon(__dirname + '/public/favicon.ico')
     , connectGzip.gzip()
+    , connect.static(__dirname + '/public')
   );
 
   server.use('/api', mediabox);
