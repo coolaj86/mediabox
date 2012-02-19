@@ -6,109 +6,109 @@
     , tags
     ;
 
-      function basename(path, ext) {
-        var b = path.lastIndexOf('/') + 1
-          , e = path.lastIndexOf(ext || '.');
+  function basename(path, ext) {
+    var b = path.lastIndexOf('/') + 1
+      , e = path.lastIndexOf(ext || '.');
 
-        return path.substr(b, e - b);
+    return path.substr(b, e - b);
+  }
+
+  function dirname(path) {
+    var b = path.lastIndexOf('/');
+    return path.substr(0, b);
+  }
+
+
+  function getTagDb() {
+    request.get('/api' + '/audio').when(function (err, ahr, data) {
+      if (err) {
+        console.error(err);
+        alert("error retreiving audio meta data");
+        return;
       }
 
-      function dirname(path) {
-        var b = path.lastIndexOf('/');
-        return path.substr(0, b);
+      if (data.error || !data.result) {
+        console.error(data);
+        alert("error retreiving audio meta data");
+        return;
       }
 
+      $('#loading').hide();
+      $('#content').show();
+      tags = data.result;
+    });
+  }
 
-      function getTagDb() {
-        request.get('/api' + '/audio').when(function (err, ahr, data) {
-          if (err) {
-            console.error(err);
-            alert("error retreiving audio meta data");
-            return;
-          }
+  var MB_TITLES = 0
+    , MB_PATHS = 1;
 
-          if (data.error || !data.result) {
-            console.error(data);
-            alert("error retreiving audio meta data");
-            return;
-          }
+  var searchable = [
+    "title",
+    "artist",
+    "album_artist",
+    "album"
+  ];
 
-          $('#loading').hide();
-          $('#content').show();
-          tags = data.result;
-        });
+  function search(pattern) {
+    var results = [];
+
+    // TODO just give back the ids
+    function find(item) {
+      item.pathTags = item.pathTags || [""];
+      var hasMatch = false
+        , pathname = item.pathTags.join('/')
+        , title;
+
+      if (pathname.match(pattern)) {
+        hasMatch = true;
       }
 
-      var MB_TITLES = 0
-        , MB_PATHS = 1;
-
-      var searchable = [
-        "title",
-        "artist",
-        "album_artist",
-        "album"
-      ];
-
-      function search(pattern) {
-        var results = [];
-
-        // TODO just give back the ids
-        function find(item) {
-          item.pathTags = item.pathTags || [""];
-          var hasMatch = false
-            , pathname = item.pathTags.join('/')
-            , title;
-
-          if (pathname.match(pattern)) {
-            hasMatch = true;
-          }
-
-          searchable.forEach(function (key) {
-            var val = item[key]
-              ;
-              
-            if (!val) {
-              return;
-            }
-
-            // TODO handle multiple tags better
-            if (Array.isArray(val)) {
-              val = val[0];
-            }
-
-            if (val.match(pattern)) {
-              hasMatch = true;
-            }
-          });
-
-          if (!hasMatch) {
-            return;
-          }
-
-          // TODO handle multiple titles gracefully
-          if (item.title && item.title.toString().match(/\w+/)) {
-            var track = item.track && item.track.toString().match(/\s*(\d+).*/)[1];
-            if (track) {
-              if (track.length < 2) {
-                track = '0' + track;
-              }
-              track += ' - ';
-            }
-            title = track + item.title + item.extname;
-          } else {
-            title = basename(item.pathTags[0]) + item.extname;
-          }
-
-          // doing this as an array to save memory
-          results.push([item.fileMd5sum, title, item]);
+      searchable.forEach(function (key) {
+        var val = item[key]
+          ;
+          
+        if (!val) {
+          return;
         }
 
-        tags.forEach(find);
+        // TODO handle multiple tags better
+        if (Array.isArray(val)) {
+          val = val[0];
+        }
 
-        return results;
+        if (val.match(pattern)) {
+          hasMatch = true;
+        }
+      });
+
+      if (!hasMatch) {
+        return;
       }
 
-      getTagDb();
+      // TODO handle multiple titles gracefully
+      if (item.title && item.title.toString().match(/\w+/)) {
+        var track = item.track && item.track.toString().match(/\s*(\d+).*/)[1];
+        if (track) {
+          if (track.length < 2) {
+            track = '0' + track;
+          }
+          track += ' - ';
+        }
+        title = track + item.title + item.extname;
+      } else {
+        title = basename(item.pathTags[0]) + item.extname;
+      }
+
+      // doing this as an array to save memory
+      results.push([item.fileMd5sum, title, item]);
+    }
+
+    tags.forEach(find);
+
+    return results;
+  }
+
+  getTagDb();
 
 
   $.domReady(function () {
@@ -248,7 +248,7 @@
 
 
 
-// playlist events
+  // playlist events
     function isPlaying() {
       if ($('.playlistitem audio').length < 1) {
         return false;
@@ -267,10 +267,10 @@
       playNext();
     }
 
-// TODO create search results from global.tags
-// TODO select random song from global.tags when playlist is empty
-// TODO shuffle by default
-// TODO add next just seconds before the first ends
+  // TODO create search results from global.tags
+  // TODO select random song from global.tags when playlist is empty
+  // TODO shuffle by default
+  // TODO add next just seconds before the first ends
     function playNext() {
       if (isPlaying()) {
         return;
