@@ -1,8 +1,9 @@
-var tags
 (function () {
   "use strict";
 
   var asciify = require('./asciify')
+    , request = require('ahr2')
+    , tags
     ;
 
       function basename(path, ext) {
@@ -19,24 +20,23 @@ var tags
 
 
       function getTagDb() {
-        var xhr, json;
-
-        xhr = new XMLHttpRequest();
-
-        xhr.onreadystatechange = function () { 
-          if (4 !== xhr.readyState) {
+        request.get('/api' + '/audio').when(function (err, ahr, data) {
+          if (err) {
+            console.error(err);
+            alert("error retreiving audio meta data");
             return;
           }
-          console.log('saved global.tags');
-          json = xhr.responseText;
-          tags = JSON.parse(json).result;
+
+          if (data.error || !data.result) {
+            console.error(data);
+            alert("error retreiving audio meta data");
+            return;
+          }
+
           $('#loading').hide();
           $('#content').show();
-        };
-
-        xhr.open('get', '/api/audio', true);
-
-        xhr.send();
+          tags = data.result;
+        });
       }
 
       var MB_TITLES = 0
@@ -85,8 +85,9 @@ var tags
             return;
           }
 
-          if (item.title && item.title.match(/\w+/)) {
-            var track = item.track && item.track.match(/\s*(\d+).*/)[1];
+          // TODO handle multiple titles gracefully
+          if (item.title && item.title.toString().match(/\w+/)) {
+            var track = item.track && item.track.toString().match(/\s*(\d+).*/)[1];
             if (track) {
               if (track.length < 2) {
                 track = '0' + track;
@@ -98,6 +99,7 @@ var tags
             title = basename(item.pathTags[0]) + item.extname;
           }
 
+          // doing this as an array to save memory
           results.push([item.fileMd5sum, title, item]);
         }
 
@@ -200,6 +202,9 @@ var tags
         var md5sum = item[MD5SUM]
           , tag = item[ITEM]
           , resource = pathFromMd5sum(md5sum) + extname(item[TITLE]);
+
+        console.log("The droids you're looking for");
+        console.log(item);
 
         var whattoshow = (item[ITEM].track || '').substr(0,2) + ' - ' + (item[ITEM].title || '') + ' - ' + (item[ITEM].artist || '');
 
@@ -341,4 +346,8 @@ var tags
     $('body').delegate('.play .ui-action', 'click', onPlayNow);
     $('body').delegate('a.skiptonext', 'click', onPlayNext);
   });
+
+  module.exports.getTags = function () {
+    return tags;
+  };
 }());

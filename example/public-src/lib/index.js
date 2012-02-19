@@ -6,6 +6,7 @@
 
   var Updrop = require('./updrop')
     , MegaUpload = require('./file-upload-queue')
+    , MediaBox = require('./mediabox')
     , $ = require('ender')
     ;
 
@@ -43,7 +44,23 @@
 
     console.log(metas);
 
-    MegaUpload.create(metas, filesMap);
+    function updateTags(metas) {
+      Object.keys(metas).forEach(function (key) {
+        var meta = metas[key]
+          ;
+
+        // TODO mediabox should respond with the meta data
+        meta.title = meta.name.replace(/\.\w{1,5}$/, '');
+        meta.extname = meta.name.replace(/.*\./, '.');
+        meta.fileMd5sum = meta.md5sum;
+        MediaBox.getTags().push(metas[key]);
+      });
+
+      console.log('uploaded:');
+      console.log(metas);
+    }
+
+    MegaUpload.create(updateTags, metas, filesMap);
   }
 
   function attachHandlers() {
@@ -60,5 +77,4 @@
   }
 
   $.domReady(attachHandlers);
-  //require('./mediabox');
 }());

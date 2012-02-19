@@ -3,13 +3,10 @@
 
   var sequence = require('sequence')()
     , request = require('ahr2')
+    //, EventEmitter = require('events').EventEmitter
     , $ = require('ender')
     , linkTpl
     ;
-
-  function sortBySize(a, b) {
-    return metas[a].size > metas[b].size ? -1 : 1;
-  }
 
   function toByteCount(size) {
     // 102.4
@@ -31,7 +28,11 @@
     return (size / (1024 * 1024 * 1024)).toFixed(1) + ' GiB';
   }
 
-  function create(metas, files) {
+  function create(onSuccess, metas, files) {
+    function sortBySize(a, b) {
+      return metas[a].size > metas[b].size ? -1 : 1;
+    }
+
     var formData = new FormData()
       , els = {}
       , keys = Object.keys(metas).sort(sortBySize)
@@ -43,6 +44,9 @@
         ;
 
       function cleanupUi(err, ahr, data) {
+        var rmetas = {}
+          ;
+
         if (err) {
           alert('error uploading data');
           console.error(err);
@@ -66,6 +70,35 @@
           link.remove();
         });
 
+        console.log('result');
+        console.log(data.result);
+
+        data.result.forEach(function (rmeta) {
+          var meta = metas[rmeta.name]
+            ;
+
+          if (!metas[rmeta.name]) {
+            console.error("got back an id we didn't ask for");
+            console.error(rmeta);
+            return;
+          }
+
+          // TODO calculate md5sum client-side to save on bandwidth
+          // TODO that would need to be a sparse md5sum with size and type
+          // TODO the response should be in a more sane format
+          meta.md5sum = rmeta.value[0].md5sum;
+        });
+
+        keys.forEach(function (key) {
+          if (!metas[key].md5sum) {
+            console.error("something failed to upload");
+            console.error(metas[key]);
+            // TODO log failures in client
+            // TODO allow incomplete files on server
+          }
+        });
+
+        onSuccess(metas);
         next();
       }
 
@@ -142,7 +175,6 @@
       link.find('.id').text(key);
       link.find('.name').text(meta.name);
       link.find('a').text(' ');
-      link.find('a').attr('href', '#');
       link.find('progress').attr('value', "0");
       link.find('progress').find('.val', "0");
       link.find('progress').attr('max', String(meta.size));
