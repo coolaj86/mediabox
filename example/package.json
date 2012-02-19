@@ -1,0 +1,24 @@
+{
+    "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info/)"
+  , "name": "MediaBox-server"
+  , "description": "Example Server for MediaBox"
+  , "version": "0.1.0"
+  , "homepage": "http://getmediabox.com"
+  , "repository": {
+      "type": "git"
+    , "url": "git://github.com/coolaj86/mediabox.git"
+  }
+  , "main": "lib/index"
+  , "scripts": {
+      "test": "node server"
+  }
+  , "engines": {
+      "node": ">= 0.4"
+  }
+  , "dependencies": {
+      "MediaBox": "0.1.x"
+    , "connect-gzip": "0.1.5"
+    , "steve": "0.5.x"
+  }
+  , "devDependencies": {}
+}
