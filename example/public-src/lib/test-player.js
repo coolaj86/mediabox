@@ -70,5 +70,5 @@
     global.testPlayerAudio = a;
   }
 
-  $.doReady(loadTestPlayer);
-}();
+  $.domReady(loadTestPlayer);
+}());
