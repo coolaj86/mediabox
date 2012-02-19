@@ -1,5 +1,5 @@
-  * db / walk abstraction
-  * http upload of file
-  * rebuild db
-  * db single item add
   * normalization
+  * prettify
+  * client side md5
+  * full library shuffle
+   
