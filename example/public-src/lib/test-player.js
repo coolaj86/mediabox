@@ -63,7 +63,7 @@
       }
     });
     $('body').delegate('.mb-vol-mute', 'click', function (ev) {
-      a.mute = !a.mute;
+      a.muted = !a.muted;
     }); 
 
     // BUG XXX don't do this, duh
