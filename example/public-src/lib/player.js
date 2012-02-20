@@ -103,6 +103,19 @@
     }
     // in contrast to cross-fade, which should begin the play
     function cleanupTrack() {
+      // TODO save volume from one song to the next
+      // We unmark this track so that if it's
+      // inserted back into the playlist, it will play again
+      if (!this.paused) {
+        // TODO maybe use a callback?
+        pauseNow();
+      }
+      delete this.mbPreviousMuteVolume;
+      delete this.mbPreviousPauseVolume;
+      delete this.mbWasAlreadyPaused;
+      this.currentTime = 0;
+      currentTrack = undefined;
+      currentTrackMeta = undefined;
       addTrack();
     }
 
@@ -140,7 +153,7 @@
       currentTrack.removeEventListener('durationchange', updateDuration);
       currentTrack.removeEventListener('timeupdate', updateTime);
       currentTrack.removeEventListener('ended', cleanupTrack);
-      currentTrack.remove();
+      $(currentTrack).remove();
 
       // TODO send data about how long it was played / if it was skipped
       emitter.emit('end', { track: currentTrackMeta });
