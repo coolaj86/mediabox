@@ -4,11 +4,23 @@
   var asciify = require('./asciify')
     , request = require('ahr2')
     , tags
+    , playerSel = '.mb-player'
+    , playlistItemSel = playlistSel + ' .playlistitem'
+    , playlistItemAudio = playlistSel + ' audio'
+    , player = require('./player').create('.mb-player')
+    , backupPlaylist = []
+    , playlist = []
+    , nowPlaying
+    , playlistHistory = []
+    , playlistSel = '.mb-playlist'
+    , playlistHistorySel = '.mb-playlist'
     ;
+
 
   function basename(path, ext) {
     var b = path.lastIndexOf('/') + 1
-      , e = path.lastIndexOf(ext || '.');
+      , e = path.lastIndexOf(ext || '.')
+      ;
 
     return path.substr(b, e - b);
   }
@@ -18,26 +30,6 @@
     return path.substr(0, b);
   }
 
-
-  function getTagDb() {
-    request.get('/api' + '/audio').when(function (err, ahr, data) {
-      if (err) {
-        console.error(err);
-        alert("error retreiving audio meta data");
-        return;
-      }
-
-      if (data.error || !data.result) {
-        console.error(data);
-        alert("error retreiving audio meta data");
-        return;
-      }
-
-      $('#loading').hide();
-      $('#content').show();
-      tags = data.result;
-    });
-  }
 
   var MB_TITLES = 0
     , MB_PATHS = 1;
@@ -108,12 +100,6 @@
     return results;
   }
 
-  getTagDb();
-
-
-  $.domReady(function () {
-
-    var g_results;
     function pathFromMd5sum(md5sum) {
       var md5split = [  
           '/api/files',
@@ -150,8 +136,6 @@
         , pattern = new RegExp(query, 'i')
         , results = search(pattern)
         , html = [];
-
-      g_results = results;
 
       console.log(query);
 
@@ -227,7 +211,7 @@
           tag.album = tag.album[tag.album.length - 1];
         }
         resultItemRows.push("" +
-          "<tr class='result'>" + 
+          "<tr data-md5sum='" + md5sum + "' class='has-md5sum result'>" + 
             "<td class='add'>" + 
               "<a class='ui-action' href='" + resource + "'>[+]</a>   " + 
             "</td>" +
@@ -246,108 +230,180 @@
       $('#search-results')[0].innerHTML = resultItemRows.join('\n');
     }
 
+    function createDomForTag(tag) {
+      var md5sum = tag.fileMd5sum || tag.md5sum || tag.md5
+        , ext = tag.extname || tag.ext || extname(String(tag.name || tag.paths || tag.pathTags || ""))
+        , resource = pathFromMd5sum(md5sum) + ext
+        ;
 
-
-  // playlist events
-    function isPlaying() {
-      if ($('.playlistitem audio').length < 1) {
-        return false;
-      }
-      if (!$('.playlistitem audio')[0].ended && !$('.playlistitem audio')[0].paused) {
-        return true;
-      }
-      return false;
+      tag.fileMd5sum = md5sum;
+      tag.href = resource;
+      tag.audio = $('<audio src="' + resource + '" preload="metadata"></audio>');
+      // TODO use PURE template
+      tag.el = $(
+        "<tr data-md5sum='" + md5sum + "' class='has-md5sum playlistitem'>" +
+          "<td class='add'>" +
+            "<a class='ui-action' href='" + resource + "'>[+]</a>   " +
+          "</td>" +
+          "<td class='play'>" +
+            "<a class='ui-action' href='" + resource + "'>[play now]</a>   " +
+            "<audio src='" + resource + "' controls='controls' preload='metadata'></audio>" +
+          "</td>" +
+          "<td class='title'>" + tag.title + "</td>" +
+          "<td class='artist'>" + tag.artist + "</td>" +
+          "<td class='album'>" + tag.album + "</td>" +
+          "</td>" +
+        "</tr>"
+      );
     }
-    // TODO (audioEl.paused && audioEl.ended) isPlaying
 
-    function onSongEnded(ev) {
-      console.log('mediaEvent', ev);
-      $($('.playlistitem')[0]).remove();
-      // TODO nextTick
-      playNext();
+    function addToPlaylist(tag) {
+      createDomForTag(tag);
+      playlist.push(tag);
+      $(playlistSel).append(tag.el);
+      tag.audio.preload = 'metadata';
     }
 
-  // TODO create search results from global.tags
-  // TODO select random song from global.tags when playlist is empty
-  // TODO shuffle by default
-  // TODO add next just seconds before the first ends
-    function playNext() {
-      if (isPlaying()) {
+    function playNext(enque) {
+      var playlistEl = $(playlistSel)
+        , playlistHistoryEl = $(playlistHistorySel)
+        , playlistEls = $(playlistSel + ' ' + '.playlistitem')
+        , tag
+        ;
+
+      if (!playlistEl || !playlistEl.length) {
+        alert('could not find playlist in dom ' + playlistSel);
         return;
       }
-      if (!$('audio') || !$('audio')[0]) {
-        console.log('no playlistitems, searching in results');
-        // TODO get a better autoshuffle
-        if ($('#search-results .result') && $('#search-results .result').length > 0) {
-          var next = Math.floor(Math.random() * $('#search-results .result').length);
-          console.log('auto selecting from list at random', $($('#search-results .result .add .ui-action')[next]));
-          // prevent infinite recursion
-          setTimeout(function () {
-            $($('#search-results .result .add .ui-action')[next]).click();
-            $($('#search-results .result')[next]).remove();
-          }, 10);
-        }
+
+      if (!playlistEls) {
+        alert('found playlist, but couldn\'t select items in dom ' + playlistSel);
         return;
       }
-      $('audio')[0].play();
-      $('audio')[0].addEventListener('ended', onSongEnded, false);
-      $('audio')[0].addEventListener('error', onSongEnded, false);
-    }
-
-    function onPlayNext(ev) {
-      ev.preventDefault();
-      if ($('.playlistitem') && $('.playlistitem').length > 0) {
-        $($('.playlistitem')[0]).remove();
-        console.log('has playlistitems, removing the current one');
+      
+      // the crossfade should finish before the next is loaded
+      if (nowPlaying) {
+        playlistHistoryEl.append(nowPlaying.el);
+        // in case the memory from the file
+        // doesn't get cleaned up automatically
+        delete nowPlaying.audio;
       }
-      // TODO
-      //if (isEnded()) {
-        playNext();
-      //}
+      // this one just just started now
+      nowPlaying = playlist.shift();
+      if (nowPlaying) {
+        playlistHistory.push(nowPlaying);
+      }
+
+      tags.sort(radomize);
+      while ($(playlistSel + ' ' + '.playlistitem').length < 10) {
+        tag = tags.pop();
+        tags.unshift(tag);
+        // adds el, audio, and md5sum
+        addToPlaylist(tag);
+      }
+
+      // this is up next
+      enque(playlist[0]);
+      // and this is next next
+      playlist[1].audio.preload = 'auto';
     }
 
     function onPlayNow(ev) {
       ev.preventDefault();
-      var resource = $(ev.target).attr('href');
-      if (!$('audio') || !$('audio')[0]) {
-        return onAddToPlaylist(ev);
+
+      var el = $(ev.target).closest('.has-md5sum')
+        , md5sum = el[0].dataset.md5sum
+        , inPlaylist
+        ;
+
+      inPlaylist = playlist.some(function (tag) {
+        var result
+          ;
+        // this is already in the playlist
+        if (md5sum === tag.md5sum) {
+          console.log('item is in the playlist. yahoo');
+          // TODO $('')
+          result = true;
+        }
+
+        if (el[0] === tag.el[0]) {
+          console.log('item is in the dom. yahoo');
+          result = true;
+        }
+
+        return result;
+      });
+
+      if (!inPlaylist) {
+        console.log("wasn't in playlist");
+      } else {
+        console.log("was in playlist");
       }
-      //$('audio')[0].pause();
-      $($('.playlistitem')[0]).remove();
-      $("#playlist").prepend("" +
-        // if preload=none, can't auto-play
-        "<div class='playlistitem'>" +
-          "<audio preload='metadata' controls><source src='" + resource + "' /></audio> " + 
-        "</div>"
-      );
-      $('audio')[0].addEventListener('ended', onSongEnded, false);
-      $('audio')[0].addEventListener('error', onSongEnded, false);
-      $('audio')[0].play();
+      console.log("not doing anything about it for now...");
     }
 
     function onAddToPlaylist(ev) {
       ev.preventDefault();
-      console.log(ev.target);
-      console.log(ev.target.href);
-      var resource = $(ev.target).attr('href');
-      console.log('href', resource);
-      $("#playlist").append("" +
-        // if preload=none, can't auto-play
-      "<div class='playlistitem'>" +
-        "<audio preload='metadata' controls><source src='" + resource + "' /></audio> " + 
-      "</div>");
-      playNext();
+
+      var el = $(ev.target).closest('.has-md5sum')
+        , md5sum = el[0].dataset.md5sum
+        , inTags
+        ;
+
+      inTags = tags.some(function (tag) {
+        if (tag.fileMd5sum === md5sum) {
+          console.log('yahoo, found a search item');
+          addToPlaylist(tag);
+          return true;
+        }
+      });
+
+      if (!inTags) {
+        console.log('not in tags... way way way odd');
+      } else {
+        console.log('in tags, but ignoring for now');
+      }
     }
 
+  function randomize() {
+    return (Math.round(Math.random()) - 0.5);
+  }
+
+  function getTagDb() {
+    request.get('/api' + '/audio').when(function (err, ahr, data) {
+      if (err) {
+        console.error(err);
+        alert("error retreiving audio meta data");
+        return;
+      }
+
+      if (data.error || !data.result) {
+        console.error(data);
+        alert("error retreiving audio meta data");
+        return;
+      }
+
+      $('#loading').hide();
+      $('#content').show();
+      tags = data.result;
+      tags.sort(randomize);
+    });
+  }
+
+  function attachHandlers() {
     $('body').delegate('form#search-library', 'submit', handleSearch);
     $('body').delegate('form#search', 'submit', handleSearch);
     $('body').delegate('form#search', 'webkitspeechchange', handleSearch);
     $('body').delegate('.add .ui-action', 'click', onAddToPlaylist);
     $('body').delegate('.play .ui-action', 'click', onPlayNow);
-    $('body').delegate('a.skiptonext', 'click', onPlayNext);
-  });
+  }
+
+  getTagDb();
+  $.domReady(attachHandlers);
+  player.on('next', playNext);
 
   module.exports.getTags = function () {
     return tags;
   };
+  module.exports.player = player;
 }());
