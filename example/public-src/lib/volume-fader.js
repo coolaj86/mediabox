@@ -12,17 +12,12 @@
   }
 
   function fadeVolume(cb, audio, newVol, time, zeroed) {
-    console.log('[fadeVolume]');
     clearInterval(audio.mbVolumeStepToken);
     newVol = sanitize(newVol);
     var diff = sanitize(newVol - audio.volume)
       , numSteps = Math.floor(time / timestep) || 1
       , increment
       ;
-
-    console.log('newVol:', newVol);
-    console.log('diff:', diff);
-    console.log('numSteps:', numSteps);
 
     if (!(newVol <= maxVol && newVol >= minVol)) {
       console.error("bad new value for volume", newVol);
@@ -42,7 +37,6 @@
     increment = sanitize(diff / numSteps);
 
     function stepVol() {
-      console.log('step vol', increment, audio.volume, newVol);
       if (
         !increment // === 0
         ||
