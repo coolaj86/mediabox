@@ -7,35 +7,12 @@ html
   body
     #big_player
       include includes/player
-      table#npwrapper
-        thead
-          th
-            h3 Artist
-          th
-            h3 Album
-          th
-            h3 Title
-          th
-            h3 Tags
-        tbody
-          tr#now_playing
-            td#artist
-              | The Dixie Chicks
-            td#album
-              | That one album.
-            td#title
-              | That one song.
-            td#tags
-              | terrible music
 
-    //-(style='display: none;')
     #content
-      h1 I'm a bus! And welcome to MediaBox
+      h1 MediaBox
       #loading loading... (takes about a minute)
-      #playlist
-      a.skiptonext(href='#next-fixme') [Skip to Next]
       form#search(action='#fixme')
-        | Search Library (Sub-searches don't work yet)
+        | Search Library
         input#search-library(x-webkit-speech='x-webkit-speech')
         input#submit(type='submit', value='Search')
         table#library
@@ -43,13 +20,13 @@ html
             tr
               th
                 | Title
-                input#search-titles(type='text', x-webkit-speech='x-webkit-speech')
+                //-input#search-titles(type='text', x-webkit-speech='x-webkit-speech')
               th
                 | Artist
-                input#search-artists(type='text', x-webkit-speech='x-webkit-speech')
+                //-input#search-artists(type='text', x-webkit-speech='x-webkit-speech')
               th
                 | Album
-                input#search-albums(type='text', x-webkit-speech='x-webkit-speech')
+                //-input#search-albums(type='text', x-webkit-speech='x-webkit-speech')
           tbody#search-results
             tr.search-result-item
               td.add
