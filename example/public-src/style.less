@@ -1,14 +1,106 @@
 @import "styles/updrop";
 @import "styles/buttons";
-#library {
-  padding: 10px;
-  background-color: #CEF;
-  --webkit-border-radius: 15px;
-  border-radius: 15px;
+@import "styles/fonts.less";
+@import "styles/playlist-history.less";
+@import "styles/playlist.less";
+
+body {
+  /*background-image:url('images/always-grey.png');*/
+  background-image: url('images/cutcube.png');
+  color: #000;
+  font-size: 14pt;
+  padding: 0;
+  margin: 0;
 }
+
+.uiview {
+  text-align: left;
+}
+
+#share.uiview {
+  text-align: center;
+}
+
+#api {
+  code {
+    font-family: monospace;
+    font-size: 12px;
+  }
+}
+
+#beta-banner {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+}
+
+header, h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 3px;
+  margin-top: 10px;
+  font-family: 'Norican', sans-serif;
+  color: black;
+}
+
+header {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  font-size: 28pt;
+}
+
+#drop-action-image {
+  width: 196px;
+}
+
+.clear {
+  clear: both;
+}
+
+#content {
+  font-family: 'Bree Serif', serif;
+  margin: 0 auto;
+  width: 920px;
+  background-color: rgba(252, 252, 252, 1.000);
+  border-radius: 10px;
+  box-shadow: 0 0 20px white;
+  padding: 20px;
+  .draw-attention {
+    font-weight: bold;
+  }
+}
+
+#big_player {
+  width: 100%;
+  display: block;
+  margin: 0;
+  background-color: rgba(0, 161, 255, 1.000);
+  height: 100px;
+  #npwrapper {
+    margin: 0 auto;
+    padding: 10px 0;
+  }
+}
+
+
+#library {
+  width: 920px;
+  margin: 1em auto;
+  padding: 15px;
+  padding-left: 20px;
+  background-color: rgba(46, 54, 59, 1.000);
+  --webkit-border-radius: 10px;
+  border-radius: 10px;
+  color: rgba(221, 171, 77, 1.000);
+  input {
+    padding: 3px;
+    border-radius: 20px;
+  }
+}
+
 #player {
   top: 0px;
+  right: 0px;
 }
+
 #player-sub {
   position: relative;
   background-color: black;

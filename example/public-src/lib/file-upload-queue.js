@@ -92,7 +92,7 @@
         keys.forEach(function (key) {
           if (!metas[key].md5sum) {
             console.error("something failed to upload");
-            console.error(metas[key]);
+            console.error(key, metas);
             // TODO log failures in client
             // TODO allow incomplete files on server
           }

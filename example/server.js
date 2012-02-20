@@ -7,7 +7,7 @@
     , connectGzip = require('connect-gzip')
     , mediabox
     , server
-    , port = config.port || 1232
+    , port = process.argv[2] || config.port || 1232
     ;
 
   function started() {

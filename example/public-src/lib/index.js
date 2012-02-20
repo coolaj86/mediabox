@@ -3,7 +3,6 @@
 
   console.log('Hello World!');
 
-
   var Updrop = require('./updrop')
     , MegaUpload = require('./file-upload-queue')
     , MediaBox = require('./mediabox')
