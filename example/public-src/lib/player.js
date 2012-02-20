@@ -196,6 +196,11 @@
 
     // play
     function playNow(ev) {
+      if (!currentTrack) {
+        console.log('feed me!');
+        emitter.emit('next', enqueTrack);
+        return;
+      }
       // TODO update times independently during crossfade
       // and let duration be the duration of the next song
       // I.E.

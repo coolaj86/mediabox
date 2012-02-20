@@ -238,7 +238,7 @@
 
       tag.fileMd5sum = md5sum;
       tag.href = resource;
-      tag.audio = $('<audio src="' + resource + '" preload="metadata"></audio>');
+      tag.audio = $('<audio src="' + resource + '" preload="metadata"></audio>')[0];
       // TODO use PURE template
       tag.el = $(
         "<tr data-md5sum='" + md5sum + "' class='has-md5sum playlistitem'>" +
@@ -294,7 +294,7 @@
         playlistHistory.push(nowPlaying);
       }
 
-      tags.sort(radomize);
+      tags.sort(randomize);
       while ($(playlistSel + ' ' + '.playlistitem').length < 10) {
         tag = tags.pop();
         tags.unshift(tag);
@@ -391,11 +391,21 @@
   }
 
   function attachHandlers() {
+    // TODO is it seriously not possible to delegate on media events?
+    // Seriously?
     $('body').delegate('form#search-library', 'submit', handleSearch);
     $('body').delegate('form#search', 'submit', handleSearch);
     $('body').delegate('form#search', 'webkitspeechchange', handleSearch);
     $('body').delegate('.add .ui-action', 'click', onAddToPlaylist);
     $('body').delegate('.play .ui-action', 'click', onPlayNow);
+
+    /*
+    var tag = tags.pop()
+      ;
+    tags.unshift(tag);
+    addToPlaylist(tag);
+    player.enque(tag);
+    */
   }
 
   getTagDb();
