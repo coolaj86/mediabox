@@ -64,6 +64,10 @@
         arr.push(nextTrack);
       }
 
+      if (nextTrack === currentTrack) {
+        arr.pop();
+      }
+
       return arr;
     }
 
@@ -228,13 +232,15 @@
       function mute() {
         track.muted = true;
       }
+
       if (track.muted) {
         track.volume = 0;
         track.muted = false;
         if ('number' !== typeof track.mbPreviousMuteVolume) {
           track.mbPreviousMuteVolume = defaultVolume;
         }
-        if (track.mbPreviousMuteVolume < volumeStep) {
+
+        if (track.mbPreviousMuteVolume < 2 * volumeStep) {
           track.mbPreviousMuteVolume = preMuteVolume;
         }
         fadeVolume(null, track, track.mbPreviousMuteVolume || defaultVolume, 150);
@@ -253,6 +259,41 @@
       getTracks().forEach(toggleMute);
     }
 
+    function increaseVolume(ev) {
+      getTracks().forEach(function (track) {
+        if (track.muted) {
+          toggleMute(track);
+          return;
+        }
+
+        if (track.volume < 1) {
+          track.volume += volumeStep;
+        }
+      });
+    }
+
+    function decreaseVolume(ev) {
+      getTracks().forEach(function (track) {
+        if (track.muted) {
+          if (track.mbPreviousMuteVolume > (2 * volumeStep)) {
+            track.mbPreviousMuteVolume -= volumeStep;
+          } else {
+            track.mbPreviousMuteVolume = volumeStep;
+          }
+          return;
+        }
+
+        if (track.volume > (2 * volumeStep)) {
+          track.volume -= volumeStep;
+        } else {
+          track.volume = volumeStep;
+          // note that volumeStep can't get lower than mute
+          // off only
+          toggleMute(track);
+        }
+      });
+    }
+
     function attachHandlers() {
       // TODO fadeout on play, pause, next, and back
 
@@ -263,40 +304,10 @@
       $(selector).delegate(selectors.pause, 'click', pauseNow);
 
       // quieter
-      $(selector).delegate(selectors.quieter, 'click', function (ev) {
-        getTracks().forEach(function (track) {
-          if (track.muted) {
-            if (track.mbPreviousMuteVolume > (2 * volumeStep)) {
-              track.mbPreviousMuteVolume -= volumeStep;
-            } else {
-              track.mbPreviousMuteVolume = volumeStep;
-            }
-            return;
-          }
-
-          if (track.volume > (2 * volumeStep)) {
-            track.volume -= volumeStep;
-          } else {
-            track.volume = volumeStep;
-            // note that volumeStep can't get lower than mute
-            // off only
-            toggleMute(track);
-          }
-        });
-      });
+      $(selector).delegate(selectors.quieter, 'click', decreaseVolume);
 
       // louder
-      $(selector).delegate(selectors.louder, 'click', function (ev) {
-        getTracks().forEach(function (track) {
-          if (track.muted) {
-            toggleMute(track);
-            return;
-          }
-          if (track.volume < 1) {
-            track.volume += volumeStep;
-          }
-        });
-      });
+      $(selector).delegate(selectors.louder, 'click', increaseVolume);
 
       // forward
       $(selector).delegate(selectors.forward, 'click', function (ev) {
