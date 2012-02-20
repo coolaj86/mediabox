@@ -39,6 +39,9 @@
           , "playtime": selector + '.mb-playtime'
           , "progress": selector + 'progress'
           , "duration": selector + '.duration'
+          , "title": selector + '.mb-title'
+          , "artist": selector + '.mb-artist'
+          , "album": selector + '.mb-album'
         }
       , defaultVolume = 1
       // these two are given separate names for semantic integrity
@@ -143,6 +146,9 @@
       global.testPlayerAudio = currentTrack;
       $(selectors.tracklist).append(currentTrack);
       $(selectors.play).show();
+      $(selectors.title).text(currentTrackMeta.title || "Uknown Track");
+      $(selectors.artist).text(currentTrackMeta.artist || "Uknown Artist");
+      $(selectors.album).text(currentTrackMeta.album || "Uknown Album");
 
       playNow();
       currentTrack.volume = preMuteVolume;
