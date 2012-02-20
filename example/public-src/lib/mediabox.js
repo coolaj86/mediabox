@@ -13,7 +13,8 @@
     , nowPlaying
     , playlistHistory = []
     , playlistSel = '.mb-playlist'
-    , playlistHistorySel = '.mb-playlist'
+    , playlistHistorySel = '.mb-playlist-history'
+    , queueMinimum = 3
     ;
 
 
@@ -295,7 +296,7 @@
       }
 
       tags.sort(randomize);
-      while ($(playlistSel + ' ' + '.playlistitem').length < 10) {
+      while ($(playlistSel + ' ' + '.playlistitem').length < queueMinimum) {
         tag = tags.pop();
         tags.unshift(tag);
         // adds el, audio, and md5sum

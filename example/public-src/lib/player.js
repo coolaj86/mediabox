@@ -89,9 +89,10 @@
 
     function enqueTrack(track) {
       nextTrack = track.audio = track.audio || $("<audio src='" + track.href + "'></audio>")[0];
+      nextTrack.mbPaused = true;
       nextTrackMeta = track;
       if (!currentTrack) {
-        addTrack();
+        playNextTrack();
       }
     }
 
@@ -120,62 +121,83 @@
       delete this.mbPreviousMuteVolume;
       delete this.mbPreviousPauseVolume;
       delete this.mbWasAlreadyPaused;
+      delete this.mbPaused
       this.currentTime = 0;
       currentTrack = undefined;
       currentTrackMeta = undefined;
-      addTrack();
+      playNextTrack();
     }
 
-    function addTrack() {
+    function playNextTrack() {
       if (!nextTrack) {
         return;
       }
-      removeTrack(true);
 
-      currentTrack = nextTrack;
-      currentTrackMeta = nextTrackMeta;
-      nextTrack = undefined;
-      nextTrackMeta = undefined;
-      emitter.emit('next', enqueTrack);
+      function reallyPlayNextTrack() {
 
-      currentTrack.addEventListener('durationchange', updateDuration);
-      currentTrack.addEventListener('timeupdate', updateTime);
-      currentTrack.addEventListener('ended', cleanupTrack);
+        currentTrack = nextTrack;
+        currentTrackMeta = nextTrackMeta;
+        delete currentTrack.mbPaused;
+        nextTrack = undefined;
+        nextTrackMeta = undefined;
+        emitter.emit('next', enqueTrack);
 
-      // BUG XXX don't do this, duh
-      global.testPlayerAudio = currentTrack;
-      $(selectors.tracklist).append(currentTrack);
-      $(selectors.play).show();
-      $(selectors.title).text(currentTrackMeta.title || "Uknown Track");
-      $(selectors.artist).text(currentTrackMeta.artist || "Uknown Artist");
-      $(selectors.album).text(currentTrackMeta.album || "Uknown Album");
+        currentTrack.addEventListener('durationchange', updateDuration);
+        currentTrack.addEventListener('timeupdate', updateTime);
+        currentTrack.addEventListener('ended', cleanupTrack);
+        currentTrack.addEventListener('error', cleanupTrack);
 
-      playNow();
-      currentTrack.volume = preMuteVolume;
+        // BUG XXX don't do this, duh
+        global.testPlayerAudio = currentTrack;
+        $(selectors.tracklist).append(currentTrack);
+        $(selectors.play).show();
+        $(selectors.title).text(currentTrackMeta.title || "Uknown Track");
+        $(selectors.artist).text(currentTrackMeta.artist || "Uknown Artist");
+        $(selectors.album).text(currentTrackMeta.album || "Uknown Album");
+
+        playNow();
+        currentTrack.volume = preMuteVolume;
+      }
+
+      removeTrack(reallyPlayNextTrack, true);
     }
 
-    function removeTrack(calledByAdd) {
+    function removeTrack(andThen, calledByAdd) {
       if (!currentTrack) {
+        andThen && andThen();
         return;
       }
 
-      // TODO add to play history
-      currentTrack.removeEventListener('durationchange', updateDuration);
-      currentTrack.removeEventListener('timeupdate', updateTime);
-      currentTrack.removeEventListener('ended', cleanupTrack);
-      $(currentTrack).remove();
+      // TODO mark as removed and let continue to play until the next track is ready
+      function removeCompletely() {
+        currentTrack.removeEventListener('durationchange', updateDuration);
+        currentTrack.removeEventListener('timeupdate', updateTime);
+        currentTrack.removeEventListener('ended', cleanupTrack);
+        // TODO better error detection
+        currentTrack.removeEventListener('error', cleanupTrack);
+        currentTrack.pause();
+        $(currentTrack).remove();
 
-      // TODO send data about how long it was played / if it was skipped
-      emitter.emit('end', { track: currentTrackMeta });
+        // TODO send data about how long it was played / if it was skipped
+        emitter.emit('end', { track: currentTrackMeta });
 
-      if (!calledByAdd) {
-        addTrack();
+        if (!calledByAdd) {
+          playNextTrack(andThen);
+          return;
+        }
+        andThen && andThen();
+      }
+
+      if (currentTrack.ended) {
+        removeCompletely();
+      } else {
+        fadeVolume(removeCompletely, currentTrack, 0, 250);
       }
     }
 
     function resumeTrack(track) {
-      if (track.mbWasAlreadyPaused) {
-        track.mbWasAlreadyPaused = false;
+      if (track.mbPaused) {
+        // not ready for crossfade
         return;
       }
       // chrome has a bug where every resume from pause
@@ -319,6 +341,14 @@
 
       // louder
       $(selector).delegate(selectors.louder, 'click', increaseVolume);
+
+      // next
+      $(selector).delegate(selectors.next, 'click', playNextTrack);
+
+      // previous
+      $(selector).delegate(selectors.previous, 'click', function () {
+        alert("Hey! :-)   Thanks for trying out the 'previous' button.... but it doesn't work yet.");
+      });
 
       // forward
       $(selector).delegate(selectors.forward, 'click', function (ev) {
