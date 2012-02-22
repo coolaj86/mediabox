@@ -1,9 +1,7 @@
 (function () {
   "use strict";
 
-  var EventEmitter = require('events').EventEmitter
-    , $ = require('ender')
-    , fadeVolume = require('./volume-fader')
+  var $ = require('ender')
     ;
 
   function pad(s) {
@@ -15,14 +13,13 @@
   }
 
   function toTime(floatSecs) {
-    return Math.floor(floatSecs / 60) + ':' + pad(Math.round(floatSecs % 59) );
+    return Math.floor(floatSecs / 60) + ':' + pad(Math.round(floatSecs % 59) ) || "-0:00";
   }
 
-  function create(selector) {
+  function create(selector, strategy) {
     selector += ' ';
 
-    var emitter = new EventEmitter()
-      , playerEl = $(selector)
+    var playerEl = $(selector)
       , selectors = {
             "play": '.mb-play'
           , "pause": '.mb-pause'
@@ -55,330 +52,87 @@
       , fadeTimeout
       ;
 
-    function getTracks() {
-      var arr = []
-        ;
-
-      if (currentTrack) {
-        arr.push(currentTrack);
-      }
-
-      if (nextTrack) {
-        arr.push(nextTrack);
-      }
-
-      if (nextTrack === currentTrack) {
-        arr.pop();
-      }
-
-      return arr;
+    function updateInfo(a, b) {
+      // prefer the song being crossfaded
+      a = b || a;
+      $(selectors.title).text(a.title || "Uknown Track");
+      $(selectors.artist).text(a.artist || "Uknown Artist");
+      $(selectors.album).text(a.album || "Uknown Album");
     }
 
-    function updateDuration(ev) {
-      $(selectors.duration).text(toTime(this.duration));
+    function updateDuration(a, b) {
+      // prefer the song being crossfaded
+      a = b || a;
+      $(selectors.progress).attr('max', a.duration);
+      $(selectors.duration).text(toTime(a.duration));
+      $(selectors.playtimeTotal).text(toTime(a.duration));
     }
 
-    function updateTime(ev) {
-      $(selectors.progress).attr('max', this.duration);
-      $(selectors.progress).attr('value', this.currentTime);
-
-      $(selectors.playtimeTotal).text(toTime(this.duration));
-      $(selectors.playtimePassed).text(toTime(this.duration - this.currentTime));
-      $(selectors.playtime).text(toTime(this.currentTime));
-    }
-
-    function enqueTrack(track) {
-      nextTrack = track.audio = track.audio || $("<audio src='" + track.href + "'></audio>")[0];
-      nextTrack.mbPaused = true;
-      nextTrackMeta = track;
-      if (!currentTrack) {
-        playNextTrack();
-      }
-    }
-
-    function skipToTrack(track) {
-      enqueTrack(track);
-      cleanupTrack();
-    }
-
-    function crossFadeTrack() {
-      if (!nextTrack) {
-        return;
-      }
-
-      // TODO fade
-      nextTrack.play();
-    }
-    // in contrast to cross-fade, which should begin the play
-    function cleanupTrack() {
-      // TODO save volume from one song to the next
-      // We unmark this track so that if it's
-      // inserted back into the playlist, it will play again
-      if (!this.paused) {
-        // TODO maybe use a callback?
-        pauseNow();
-      }
-      delete this.mbPreviousMuteVolume;
-      delete this.mbPreviousPauseVolume;
-      delete this.mbWasAlreadyPaused;
-      delete this.mbPaused
-      this.currentTime = 0;
-      currentTrack = undefined;
-      currentTrackMeta = undefined;
-      playNextTrack();
-    }
-
-    function playNextTrack() {
-      if (!nextTrack) {
-        return;
-      }
-
-      function reallyPlayNextTrack() {
-
-        currentTrack = nextTrack;
-        currentTrackMeta = nextTrackMeta;
-        delete currentTrack.mbPaused;
-        nextTrack = undefined;
-        nextTrackMeta = undefined;
-        emitter.emit('next', enqueTrack);
-
-        currentTrack.addEventListener('durationchange', updateDuration);
-        currentTrack.addEventListener('timeupdate', updateTime);
-        currentTrack.addEventListener('ended', cleanupTrack);
-        currentTrack.addEventListener('error', cleanupTrack);
-
-        // BUG XXX don't do this, duh
-        global.testPlayerAudio = currentTrack;
-        $(selectors.tracklist).append(currentTrack);
-        $(selectors.play).show();
-        $(selectors.title).text(currentTrackMeta.title || "Uknown Track");
-        $(selectors.artist).text(currentTrackMeta.artist || "Uknown Artist");
-        $(selectors.album).text(currentTrackMeta.album || "Uknown Album");
-
-        playNow();
-        currentTrack.volume = preMuteVolume;
-      }
-
-      removeTrack(reallyPlayNextTrack, true);
-    }
-
-    function removeTrack(andThen, calledByAdd) {
-      if (!currentTrack) {
-        andThen && andThen();
-        return;
-      }
-
-      // TODO mark as removed and let continue to play until the next track is ready
-      function removeCompletely() {
-        currentTrack.removeEventListener('durationchange', updateDuration);
-        currentTrack.removeEventListener('timeupdate', updateTime);
-        currentTrack.removeEventListener('ended', cleanupTrack);
-        // TODO better error detection
-        currentTrack.removeEventListener('error', cleanupTrack);
-        currentTrack.pause();
-        $(currentTrack).remove();
-
-        // TODO send data about how long it was played / if it was skipped
-        emitter.emit('end', { track: currentTrackMeta });
-
-        if (!calledByAdd) {
-          playNextTrack(andThen);
-          return;
-        }
-        andThen && andThen();
-      }
-
-      if (currentTrack.ended) {
-        removeCompletely();
-      } else {
-        fadeVolume(removeCompletely, currentTrack, 0, 250);
-      }
-    }
-
-    function resumeTrack(track) {
-      if (track.mbPaused) {
-        // not ready for crossfade
-        return;
-      }
-      // chrome has a bug where every resume from pause
-      // results in an audio glitch sometime during the first 1000ms
-      // this is a lousy hack to fix that
-      if (track.currentTime > 1.5) {
-        track.currentTime -= 1.5;
-      // throws DOM exception if 0 is set to 0 (or perhaps just if play() hasn't happened yet)
-      } else if (track.currentTime) {
-        track.currentTime = 0;
-      }
-      track.volume = 0;
-      track.play();
-      setTimeout(function () {
-        fadeVolume(null, track, track.mbPreviousPauseVolume || defaultVolume, 300);
-      }, 750);
-    }
-
-    // play
-    function playNow(ev) {
-      if (!currentTrack) {
-        console.log('feed me!');
-        emitter.emit('next', enqueTrack);
-        return;
-      }
-      // TODO update times independently during crossfade
-      // and let duration be the duration of the next song
-      // I.E.
-      // 0:03    3:46    -0:03
-      getTracks().forEach(resumeTrack);
-
-      // these need to change after the resume / pause timeout is cancelled
-      // in case of doubleclick
-      $(selector + ' ' + selectors.pause).show();
-      $(selector + ' ' + selectors.play).hide();
-      updateTime.apply(currentTrack);
-    }
-      
-    function pauseNow(ev) {
-      getTracks().forEach(function (track) {
-        function pause() {
-          track.pause();
-          track.muted = false;
-        }
-        if (track.paused) {
-          track.mbWasAlreadyPaused = true;
-        }
-        if (track.muted) {
-          track.mbPreviousPauseVolume = track.mbPreviousMuteVolume;
-        } else {
-          track.mbPreviousPauseVolume = track.volume;
-        }
-        fadeVolume(pause, track, 0, 300);
-      });
-
-      // fadeVolume uses a timeout, these should not
-      // be able to change until that has been registered
-      $(selector + ' ' + selectors.play).show();
-      $(selector + ' ' + selectors.pause).hide();
-
-      updateTime.apply(currentTrack);
-    }
-
-    function toggleMute(track) {
-      function mute() {
-        track.muted = true;
-      }
-
-      if (track.muted) {
-        track.volume = 0;
-        track.muted = false;
-        if ('number' !== typeof track.mbPreviousMuteVolume) {
-          track.mbPreviousMuteVolume = defaultVolume;
-        }
-
-        if (track.mbPreviousMuteVolume < 2 * volumeStep) {
-          track.mbPreviousMuteVolume = preMuteVolume;
-        }
-        fadeVolume(null, track, track.mbPreviousMuteVolume || defaultVolume, 150);
-      } else {
-        if (track.paused) {
-          // TODO needs UI cue
-          return;
-        }
-        track.mbPreviousMuteVolume = track.volume;
-        fadeVolume(mute, track, 0, 150);
-      }
-    }
-
-    function muteTracks(ev) {
-      // handles the mute-during-crossfade case
-      getTracks().forEach(toggleMute);
-    }
-
-    function increaseVolume(ev) {
-      getTracks().forEach(function (track) {
-        if (track.muted) {
-          toggleMute(track);
-          return;
-        }
-
-        if (track.volume < 1) {
-          track.volume += volumeStep;
-        }
-      });
-    }
-
-    function decreaseVolume(ev) {
-      getTracks().forEach(function (track) {
-        if (track.muted) {
-          if (track.mbPreviousMuteVolume > (2 * volumeStep)) {
-            track.mbPreviousMuteVolume -= volumeStep;
-          } else {
-            track.mbPreviousMuteVolume = volumeStep;
-          }
-          return;
-        }
-
-        if (track.volume > (2 * volumeStep)) {
-          track.volume -= volumeStep;
-        } else {
-          track.volume = volumeStep;
-          // note that volumeStep can't get lower than mute
-          // off only
-          toggleMute(track);
-        }
-      });
+    function updateTime(a, b) {
+      // prefer the song being crossfaded
+      a = b || a;
+      $(selectors.progress).attr('value', a.currentTime);
+      $(selectors.playtimePassed).text(toTime(a.duration - a.currentTime));
+      $(selectors.playtime).text(toTime(a.currentTime));
     }
 
     function attachHandlers() {
       // TODO fadeout on play, pause, next, and back
 
-      // play
-      $(selector).delegate(selectors.play, 'click', playNow);
+      // play / resume
+      $(selector).delegate(selectors.play, 'click', strategy.playNow);
 
       // pause
-      $(selector).delegate(selectors.pause, 'click', pauseNow);
+      $(selector).delegate(selectors.pause, 'click', strategy.pauseNow);
 
-      // quieter
-      $(selector).delegate(selectors.quieter, 'click', decreaseVolume);
+      // decreaseVolume
+      $(selector).delegate(selectors.quieter, 'click', strategy.decreaseVolume);
 
-      // louder
-      $(selector).delegate(selectors.louder, 'click', increaseVolume);
+      // incluseVolume
+      $(selector).delegate(selectors.louder, 'click', strategy.increaseVolume);
 
-      // next
-      $(selector).delegate(selectors.next, 'click', playNextTrack);
+      // nextTrack
+      $(selector).delegate(selectors.next, 'click', strategy.playNextTrack);
 
-      // previous
+      // previousTrack
       $(selector).delegate(selectors.previous, 'click', function () {
+        // strategy.skipTo
         alert("Hey! :-)   Thanks for trying out the 'previous' button.... but it doesn't work yet.");
       });
 
-      // forward
+      // TODO seek for slider
+      // TODO get duration from strategy
+
+      // seekAhead / forward
       $(selector).delegate(selectors.forward, 'click', function (ev) {
-        if (currentTrack.currentTime < currentTrack.duration) {
-          currentTrack.currentTime += positionStep;
-        }
+        // TODO relative seek?
+        strategy.forward(positionStep);
       });
 
-      // back
+      // seekBehind / back
       $(selector).delegate(selectors.back, 'click', function (ev) {
-        if (currentTrack.currentTime > 0) {
-          currentTrack.currentTime -= positionStep;
-        }
+        strategy.back(positionStep);
       });
 
       // mute
-      $(selector).delegate(selectors.mute, 'click', muteTracks);
+      $(selector).delegate(selectors.mute, 'click', strategy.muteTracks);
 
+      // TODO listen on play / pause
       $(selectors.play).show();
       $(selectors.pause).hide();
+
+      strategy.on('pause', function () {
+        $(selectors.pause).hide();
+        $(selectors.play).show();
+      });
+
+      strategy.on('playing', function () {
+        $(selectors.pause).hide();
+        $(selectors.play).show();
+      });
     }
 
     $.domReady(attachHandlers);
-
-    // add should add item to the list and start playing if nothing better to do
-    // play should move item to top of list and crossfade current song
-    // insert(<pos>) should add at position <pos> or last if omitted
-    emitter.enque = enqueTrack;
-    emitter.play = skipToTrack;
-    return emitter;
   }
 
   module.exports.create = create;

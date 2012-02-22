@@ -3,11 +3,13 @@
 
   var asciify = require('./asciify')
     , request = require('ahr2')
+    , targetInfo = require('./target-info')
     , tags
     , playerSel = '.mb-player'
     , playlistItemSel = playlistSel + ' .playlistitem'
     , playlistItemAudio = playlistSel + ' audio'
-    , player = require('./player').create('.mb-player')
+    , strategy = require('./player-engine').create()
+    , player = require('./player').create('.mb-player', strategy)
     , backupPlaylist = []
     , playlist = []
     , nowPlaying
@@ -16,7 +18,6 @@
     , playlistHistorySel = '.mb-playlist-history'
     , queueMinimum = 3
     ;
-
 
   function basename(path, ext) {
     var b = path.lastIndexOf('/') + 1
@@ -103,7 +104,7 @@
 
     function pathFromMd5sum(md5sum) {
       var md5split = [  
-          '/api/files',
+          '/files',
           md5sum.substr(0,3),
           md5sum
         ];
@@ -186,7 +187,8 @@
       results.forEach(function (item) {
         var md5sum = item[MD5SUM]
           , tag = item[ITEM]
-          , resource = pathFromMd5sum(md5sum) + extname(item[TITLE]);
+          , resource = targetInfo.getApiHref() + pathFromMd5sum(md5sum) + extname(item[TITLE])
+          ;
 
         console.log("The droids you're looking for");
         console.log(item);
@@ -234,7 +236,7 @@
     function createDomForTag(tag) {
       var md5sum = tag.fileMd5sum || tag.md5sum || tag.md5
         , ext = tag.extname || tag.ext || extname(String(tag.name || tag.paths || tag.pathTags || ""))
-        , resource = pathFromMd5sum(md5sum) + ext
+        , resource = targetInfo.getApiHref() + pathFromMd5sum(md5sum) + ext
         ;
 
       tag.fileMd5sum = md5sum;
@@ -248,7 +250,6 @@
           "</td>" +
           "<td class='play'>" +
             "<a class='ui-action' href='" + resource + "'>[play now]</a>   " +
-            "<audio src='" + resource + "' controls='controls' preload='metadata'></audio>" +
           "</td>" +
           "<td class='title'>" + tag.title + "</td>" +
           "<td class='artist'>" + tag.artist + "</td>" +
@@ -371,7 +372,7 @@
   }
 
   function getTagDb() {
-    request.get('/api' + '/audio').when(function (err, ahr, data) {
+    request.get(targetInfo.getApiHref() + '/audio').when(function (err, ahr, data) {
       if (err) {
         console.error(err);
         alert("error retreiving audio meta data");
@@ -411,7 +412,7 @@
 
   getTagDb();
   $.domReady(attachHandlers);
-  player.on('next', playNext);
+  strategy.on('next', playNext);
 
   module.exports.getTags = function () {
     return tags;

@@ -4,6 +4,7 @@
   var sequence = require('sequence')()
     , request = require('ahr2')
     //, EventEmitter = require('events').EventEmitter
+    , targetInfo = require('./target-info')
     , $ = require('ender')
     , linkTpl
     ;
@@ -138,14 +139,14 @@
         console.log('progressEv', ev.loaded, ev.total);
       }
 
-      emitter = request.post('/api' + '/upload/' + id, null, formData, { headers: { 'x-user-session': session } });
+      emitter = request.post(targetInfo.getApiHref() + '/upload/' + id, null, formData, { headers: { 'x-user-session': session } });
       emitter.upload.on('progress', updateProgress);
       emitter.when(cleanupUi);
     }
 
     function nextMeta(next) {
       // TODO use a session
-      request.post('/api' + '/upload/new', null, metas).when(function (err, ahr, data) {
+      request.post(targetInfo.getApiHref() + '/upload/new', null, metas).when(function (err, ahr, data) {
         var id
           ;
         
