@@ -127,8 +127,8 @@
       });
 
       strategy.on('playing', function () {
-        $(selectors.pause).hide();
-        $(selectors.play).show();
+        $(selectors.pause).show();
+        $(selectors.play).hide();
       });
     }
 

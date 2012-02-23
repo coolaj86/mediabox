@@ -13,6 +13,41 @@
     return Math.floor(Math.random() * 10000000000000000000000).toString(36);
   }
 
+  function readFile(file) {
+    var FileReader = require('FileReader')
+      , fileReader = new FileReader()
+      ;
+
+    fileReader.onload = function (ev) {
+      console.log('load');
+      var audio = new Audio()
+        ;
+
+      audio.src = ev.target.result;
+      global.localAudioFiles.push(audio);
+      global.localFileDataUrls.push(ev.target.result);
+    };
+
+    global.localFiles.push(file);
+    console.log('about to read');
+    fileReader.readAsDataURL(file);
+    console.log('about to read 2');
+  }
+
+  function handleLocalLoad(files) {
+    var i
+      , file
+      ;
+
+    global.localFiles = global.localFiles || [];
+    global.localAudioFiles = global.localAudioFiles || [];
+    global.localFileDataUrls = global.localFileDataUrls || [];
+
+    for (i = 0; i < files.length; i += 1) {
+      readFile(files[i]);
+    }
+  }
+
   function handleUpload(files) {
     var postBody = {}
       , i
@@ -69,6 +104,7 @@
     // TODO set the class on the button for hover even though
     // it's masked by the file chooser above it
     // NOTE the file-chooser doesn't work if the content area is hidden and then .show()n
+    Updrop.create(handleLocalLoad, '#local-drop-container', '#local-dropzone');
     Updrop.create(handleUpload, '#drop-container', '#dropzone');
     abstracter = Updrop.abstract(handleUpload);
     $('body').bind('dragover', Updrop.handleDrag);

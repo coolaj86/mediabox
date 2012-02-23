@@ -1,15 +1,15 @@
 .mb-player
   span.mb-audios
-  span.mb-play [play]
-  span.mb-pause [pause]
+  button.mb-play |>
+  button.mb-pause ||
   br
-  span.mb-previous [<<]
+  button.mb-previous <<
     | &nbsp;
-  span.mb-pos-back [<]
+  button.mb-pos-back <
   progress
-  span.mb-pos-forward [>]
+  button.mb-pos-forward >
     | &nbsp;
-  span.mb-next [>>]
+  button.mb-next >>
   br
   span.mb-playtime-passed
     | 0:00
@@ -21,9 +21,9 @@
     | 0:00
   span &nbsp;
   br
-  span.mb-vol-up [+]
-  span.mb-vol-down [-]
-  span.mb-vol-mute [!]
+  button.mb-vol-up +Vol
+  button.mb-vol-down -Vol
+  button.mb-vol-mute Mute
   div.mb-art
   ul
     li.mb-title
