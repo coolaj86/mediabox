@@ -22,6 +22,7 @@
       , fadeTimeout
       , debugHandlers
       , history = []
+      , playerVolume
       ;
 
     function getTracks() {
@@ -82,7 +83,9 @@
       delete this.mbPreviousPauseVolume;
       delete this.mbWasAlreadyPaused;
       delete this.mbPaused
-      this.currentTime = 0;
+      if (this.currentTime) {
+        this.currentTime = 0;
+      }
       currentTrack = undefined;
       currentTrackMeta = undefined;
       playNextTrack();
@@ -186,7 +189,7 @@
           console.log('timeupdate');
         }
       , "volumechange": function () {
-          console.log('volumechange');
+          console.log('volumechange', this.volume);
         }
       , "waiting": function () {
           console.log('waiting');
@@ -203,6 +206,8 @@
         currentTrack = nextTrack;
         currentTrackMeta = nextTrackMeta;
         delete currentTrack.mbPaused;
+        // TODO have all important data on this structure
+        emitter.emit('infoupdate', currentTrackMeta);
         nextTrack = undefined;
         nextTrackMeta = undefined;
 
@@ -236,9 +241,22 @@
         currentTrack.addEventListener('waiting', debugHandlers.waiting);
 
         emitter.emit('next', enqueTrack);
+        currentTrack.addEventListener('progress', function () {
+          emitter.emit('progress', this);
+        });
+        currentTrack.addEventListener('suspend', function () {
+          emitter.emit('suspend', this);
+        });
 
-        //currentTrack.addEventListener('durationchange', updateDuration);
-        //currentTrack.addEventListener('timeupdate', updateTime);
+        currentTrack.addEventListener('volumechange', function () {
+          emitter.emit('volumechange', Math.floor(this.volume * 1000));
+        });
+        currentTrack.addEventListener('durationchange', function () {
+          emitter.emit('durationchange', this);
+        });
+        currentTrack.addEventListener('timeupdate', function () {
+          emitter.emit('timeupdate', this);
+        });
         currentTrack.addEventListener('ended', cleanupTrack);
         currentTrack.addEventListener('error', cleanupTrack);
 
@@ -365,7 +383,6 @@
       // these need to change after the resume / pause timeout is cancelled
       // in case of doubleclick
       emitter.emit('playing');
-      updateTime.apply(currentTrack);
     }
       
     function pauseNow(ev) {
@@ -388,7 +405,6 @@
       // fadeVolume uses a timeout, these should not
       // be able to change until that has been registered
       emitter.emit('pause');
-      updateTime.apply(currentTrack);
     }
 
     function toggleMute(track) {
@@ -422,6 +438,11 @@
       getTracks().forEach(toggleMute);
     }
 
+    function changeVolume(val) {
+      playerVolume = Number((val / 1000).toFixed(3));
+      currentTrack.volume = playerVolume;
+    }
+
     function increaseVolume(ev) {
       getTracks().forEach(function (track) {
         if (track.muted) {
@@ -430,7 +451,8 @@
         }
 
         if (track.volume < 1) {
-          track.volume += volumeStep;
+          // 1000 ticks of volume are more than enough and prevent weirdness
+          track.volume = Number((track.volume + volumeStep).toFixed(3));
         }
       });
     }
@@ -447,7 +469,8 @@
         }
 
         if (track.volume > (2 * volumeStep)) {
-          track.volume -= volumeStep;
+          track.volume = Number((track.volume - volumeStep).toFixed(3));
+          //track.volume -= volumeStep;
         } else {
           track.volume = volumeStep;
           // note that volumeStep can't get lower than mute
@@ -486,6 +509,7 @@
     emitter.pauseNow = pauseNow;
     emitter.decreaseVolume = decreaseVolume;
     emitter.increaseVolume = increaseVolume;
+    emitter.changeVolume = changeVolume;
     emitter.playNextTrack = playNextTrack;
     emitter.previous = function () {};
     // seekAhead / fast-forward

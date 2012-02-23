@@ -13,7 +13,21 @@
   }
 
   function toTime(floatSecs) {
-    return Math.floor(floatSecs / 60) + ':' + pad(Math.round(floatSecs % 59) ) || "-0:00";
+    var mins
+      , secs
+      ;
+
+    if (!floatSecs) {
+      return '-0:00';
+    }
+
+    floatSecs = Math.floor(floatSecs);
+
+    mins = Math.floor(floatSecs / 60);
+    floatSecs -= (mins * 60);
+    secs = Math.round(floatSecs);
+
+    return mins + ':' + pad(secs);
   }
 
   function create(selector, strategy) {
@@ -34,11 +48,14 @@
           , "playtimeTotal": selector + '.mb-playtime-total'
           , "playtimePassed": selector + '.mb-playtime-passed'
           , "playtime": selector + '.mb-playtime'
-          , "progress": selector + 'progress'
+          , "progress": selector + '.mb-progress'
+          , "buffer": selector + '.mb-buffer'
+          , "volume": selector + '.mb-volume'
           , "duration": selector + '.duration'
           , "title": selector + '.mb-title'
           , "artist": selector + '.mb-artist'
           , "album": selector + '.mb-album'
+          , "buffering": selector + '.mb-buffering'
         }
       , defaultVolume = 1
       // these two are given separate names for semantic integrity
@@ -60,10 +77,16 @@
       $(selectors.album).text(a.album || "Uknown Album");
     }
 
+    function updateVolume(volume) {
+      $(selectors.volume).attr('value', volume);
+    }
     function updateDuration(a, b) {
       // prefer the song being crossfaded
       a = b || a;
+      $(selectors.buffer).attr('max', a.duration);
+      $(selectors.buffer).attr('value', 0);
       $(selectors.progress).attr('max', a.duration);
+      $(selectors.progress).attr('value', a.currentTime);
       $(selectors.duration).text(toTime(a.duration));
       $(selectors.playtimeTotal).text(toTime(a.duration));
     }
@@ -72,12 +95,20 @@
       // prefer the song being crossfaded
       a = b || a;
       $(selectors.progress).attr('value', a.currentTime);
-      $(selectors.playtimePassed).text(toTime(a.duration - a.currentTime));
+      $(selectors.playtimePassed).text(toTime(Math.floor(a.duration) - Math.floor(a.currentTime)));
       $(selectors.playtime).text(toTime(a.currentTime));
     }
 
     function attachHandlers() {
       // TODO fadeout on play, pause, next, and back
+
+      // volume
+      $(selector).delegate(selectors.volume, 'change', function () {
+        var val = $(this).val()
+          ;
+
+        strategy.changeVolume(val);
+      });
 
       // play / resume
       $(selector).delegate(selectors.play, 'click', strategy.playNow);
@@ -129,6 +160,32 @@
       strategy.on('playing', function () {
         $(selectors.pause).show();
         $(selectors.play).hide();
+      });
+
+      strategy.on('durationchange', updateDuration);
+      strategy.on('volumechange', updateVolume);
+      strategy.on('timeupdate', updateTime);
+      strategy.on('infoupdate', updateInfo);
+      strategy.on('progress', function (a) {
+        var len = a.buffered.length
+          ;
+
+        if (len) {
+          // assuming the last buffer will have the highest number
+          $(selectors.buffer).attr('value', a.buffered.end(len - 1));
+        }
+
+        $(selectors.buffering).show();
+      });
+      strategy.on('suspend', function (a) {
+        var len = a.buffered.length
+          ;
+
+        if (len) {
+          // assuming the last buffer will have the highest number
+          $(selectors.buffer).attr('value', a.buffered.end(len - 1));
+        }
+        $(selectors.buffering).hide();
       });
     }
 
