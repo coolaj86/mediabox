@@ -7,6 +7,13 @@
   // TODO use init to assign player strategy
     ;
 
+  function toSaneVolumeNum(n) {
+    return Number((n * 1000).toFixed(0));
+  }
+  function fromSaneVolumeNum(n) {
+    return Number((n / 1000).toFixed(3));
+  }
+
   function create() {
 
     var emitter = new EventEmitter()
@@ -22,7 +29,7 @@
       , fadeTimeout
       , debugHandlers
       , history = []
-      , playerVolume
+      , playerVolume = 0.8
       ;
 
     function getTracks() {
@@ -79,8 +86,6 @@
         // TODO maybe use a callback?
         pauseNow();
       }
-      delete this.mbPreviousMuteVolume;
-      delete this.mbPreviousPauseVolume;
       delete this.mbWasAlreadyPaused;
       delete this.mbPaused
       if (this.currentTime) {
@@ -202,9 +207,19 @@
       }
 
       function reallyPlayNextTrack() {
+        var lastTrack
+          , lastTrackMeta
+          ;
+
+        lastTrack = currentTrack;
+        lastTrackMeta = currentTrackMeta;
 
         currentTrack = nextTrack;
         currentTrackMeta = nextTrackMeta;
+
+        currentTrack.volume = playerVolume;
+        emitter.emit('volumechange', toSaneVolumeNum(playerVolume));
+        emitter.emit('rawvolumechange', toSaneVolumeNum(playerVolume));
         delete currentTrack.mbPaused;
         // TODO have all important data on this structure
         emitter.emit('infoupdate', currentTrackMeta);
@@ -249,7 +264,8 @@
         });
 
         currentTrack.addEventListener('volumechange', function () {
-          emitter.emit('volumechange', Math.floor(this.volume * 1000));
+          // don't allow wonky volumes, keep it in the 1000 range
+          emitter.emit('rawvolumechange', toSaneVolumeNum(this.volume));
         });
         currentTrack.addEventListener('durationchange', function () {
           emitter.emit('durationchange', this);
@@ -363,7 +379,7 @@
       track.volume = 0;
       track.play();
       setTimeout(function () {
-        fadeVolume(null, track, track.mbPreviousPauseVolume || defaultVolume, 300);
+        fadeVolume(null, track, playerVolume, 300);
       }, 750);
     }
 
@@ -394,11 +410,6 @@
         if (track.paused) {
           track.mbWasAlreadyPaused = true;
         }
-        if (track.muted) {
-          track.mbPreviousPauseVolume = track.mbPreviousMuteVolume;
-        } else {
-          track.mbPreviousPauseVolume = track.volume;
-        }
         fadeVolume(pause, track, 0, 300);
       });
 
@@ -415,20 +426,16 @@
       if (track.muted) {
         track.volume = 0;
         track.muted = false;
-        if ('number' !== typeof track.mbPreviousMuteVolume) {
-          track.mbPreviousMuteVolume = defaultVolume;
+        if (playerVolume < 2 * preMuteVolume) {
+          playerVolume = 2 * preMuteVolume;
+          emitter.emit('volumechange', toSaneVolumeNum(playerVolume));
         }
-
-        if (track.mbPreviousMuteVolume < 2 * volumeStep) {
-          track.mbPreviousMuteVolume = preMuteVolume;
-        }
-        fadeVolume(null, track, track.mbPreviousMuteVolume || defaultVolume, 150);
+        fadeVolume(null, track, playerVolume, 150);
       } else {
         if (track.paused) {
           // TODO needs UI cue
           return;
         }
-        track.mbPreviousMuteVolume = track.volume;
         fadeVolume(mute, track, 0, 150);
       }
     }
@@ -440,6 +447,7 @@
 
     function changeVolume(val) {
       playerVolume = Number((val / 1000).toFixed(3));
+      emitter.emit('volumechange', toSaneVolumeNum(playerVolume));
       currentTrack.volume = playerVolume;
     }
 
@@ -452,7 +460,8 @@
 
         if (track.volume < 1) {
           // 1000 ticks of volume are more than enough and prevent weirdness
-          track.volume = Number((track.volume + volumeStep).toFixed(3));
+          track.volume = playerVolume = Number((track.volume + volumeStep).toFixed(3));
+          emitter.emit('volumechange', toSaneVolumeNum(playerVolume));
         }
       });
     }
@@ -460,23 +469,25 @@
     function decreaseVolume(ev) {
       getTracks().forEach(function (track) {
         if (track.muted) {
-          if (track.mbPreviousMuteVolume > (2 * volumeStep)) {
-            track.mbPreviousMuteVolume -= volumeStep;
+          if (playerVolume > (2 * volumeStep)) {
+            playerVolume = Number((playerVolume - volumeStep).toFixed(3));
           } else {
-            track.mbPreviousMuteVolume = volumeStep;
+            playerVolume = volumeStep;
           }
+          emitter.emit('volumechange', toSaneVolumeNum(playerVolume));
           return;
         }
 
-        if (track.volume > (2 * volumeStep)) {
-          track.volume = Number((track.volume - volumeStep).toFixed(3));
-          //track.volume -= volumeStep;
+        if (playerVolume > (2 * volumeStep)) {
+          track.volume = Number((playerVolume - volumeStep).toFixed(3));
         } else {
           track.volume = volumeStep;
           // note that volumeStep can't get lower than mute
           // off only
           toggleMute(track);
         }
+        playerVolume = track.volume;
+        emitter.emit('volumechange', toSaneVolumeNum(playerVolume));
       });
     }
 

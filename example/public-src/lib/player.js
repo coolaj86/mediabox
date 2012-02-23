@@ -51,6 +51,7 @@
           , "progress": selector + '.mb-progress'
           , "buffer": selector + '.mb-buffer'
           , "volume": selector + '.mb-volume'
+          , "rawvolume": selector + '.mb-volume-raw'
           , "duration": selector + '.duration'
           , "title": selector + '.mb-title'
           , "artist": selector + '.mb-artist'
@@ -60,12 +61,7 @@
       , defaultVolume = 1
       // these two are given separate names for semantic integrity
       , volumeStep = 0.05
-      , preMuteVolume = volumeStep
       , positionStep = 5
-      , currentTrackMeta
-      , currentTrack
-      , nextTrack
-      , nextTrackMeta
       , fadeTimeout
       ;
 
@@ -77,6 +73,9 @@
       $(selectors.album).text(a.album || "Uknown Album");
     }
 
+    function updateRawVolume(volume) {
+      $(selectors.rawvolume).attr('value', volume);
+    }
     function updateVolume(volume) {
       $(selectors.volume).attr('value', volume);
     }
@@ -164,6 +163,7 @@
 
       strategy.on('durationchange', updateDuration);
       strategy.on('volumechange', updateVolume);
+      strategy.on('rawvolumechange', updateRawVolume);
       strategy.on('timeupdate', updateTime);
       strategy.on('infoupdate', updateInfo);
       strategy.on('progress', function (a) {
