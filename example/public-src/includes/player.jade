@@ -1,35 +1,37 @@
 .mb-player
-  span.mb-audios
-  button.mb-play |>
-  button.mb-pause ||
-  progress.mb-buffer
-  span.mb-buffering
-    img(src='/images/loading.gif')
-  br
-  button.mb-previous <<
-    | &nbsp;
-  button.mb-pos-back <
-  progress.mb-progress
-  button.mb-pos-forward >
-    | &nbsp;
-  button.mb-next >>
-  br
-  span.mb-playtime-passed
-    | 0:00
-  span &nbsp;
-  span.mb-playtime-total
-    | 0:00
-  span &nbsp;
-  span.mb-playtime
-    | 0:00
-  span &nbsp;
-  br
-  button.mb-vol-up +Vol
-  button.mb-vol-down -Vol
-  button.mb-vol-mute Mute
-  input(type="range").mb-volume(min="0", max="1000", value="800")
-  div.mb-art
-  ul
-    li.mb-title
-    li.mb-artist
-    li.mb-album
+  .css-mb-leftbox
+    span.mb-audios
+    button.mb-play |>
+    button.mb-pause ||
+    progress.mb-buffer
+    span.mb-buffering
+      img(src='/images/loading.gif')
+    br
+    button.mb-previous <<
+      | &nbsp;
+    button.mb-pos-back <
+    progress.mb-progress
+    button.mb-pos-forward >
+      | &nbsp;
+    button.mb-next >>
+    br
+    span.mb-playtime-passed
+      | 0:00
+    span &nbsp;
+    span.mb-playtime-total
+      | 0:00
+    span &nbsp;
+    span.mb-playtime
+      | 0:00
+    span &nbsp;
+    br
+    button.mb-vol-up +Vol
+    button.mb-vol-down -Vol
+    button.mb-vol-mute Mute
+    input(type="range").mb-volume(min="0", max="1000", value="800")
+    div.mb-art
+  .css-mb-rightbox
+    ul
+      li.mb-title
+      li.mb-artist
+      li.mb-album
