@@ -112,7 +112,14 @@
         console.log('volumechange', this.volume, ((this.volume / 1) * 100).toFixed(0) + '%');
       }
     , "waiting": function (ev) {
+        var self = this
+          ;
+
         console.log('waiting');
+        function forceError() {
+          self.src = 'foo://bar';
+        }
+        setTimeout(forceError, 1000);
       }
   };
 
