@@ -79,13 +79,17 @@
     function updateVolume(volume) {
       $(selectors.volume).attr('value', volume);
     }
+
     function updateDuration(a, b) {
       // prefer the song being crossfaded
       a = b || a;
       $(selectors.buffer).attr('max', a.duration);
+      // TODO use real current value
       $(selectors.buffer).attr('value', 0);
+
       $(selectors.progress).attr('max', a.duration);
       $(selectors.progress).attr('value', a.currentTime);
+
       $(selectors.duration).text(toTime(a.duration));
       $(selectors.playtimeTotal).text(toTime(a.duration));
     }
@@ -106,23 +110,27 @@
         var val = $(this).val()
           ;
 
-        strategy.changeVolume(val);
+        strategy.volume(val);
       });
 
       // play / resume
-      $(selector).delegate(selectors.play, 'click', strategy.playNow);
+      $(selector).delegate(selectors.play, 'click', strategy.resume);
 
       // pause
-      $(selector).delegate(selectors.pause, 'click', strategy.pauseNow);
+      $(selector).delegate(selectors.pause, 'click', strategy.pause);
 
       // decreaseVolume
-      $(selector).delegate(selectors.quieter, 'click', strategy.decreaseVolume);
+      $(selector).delegate(selectors.quieter, 'click', function () {
+        strategy.decreaseVolume();
+      });
 
       // incluseVolume
-      $(selector).delegate(selectors.louder, 'click', strategy.increaseVolume);
+      $(selector).delegate(selectors.louder, 'click', function () {
+        strategy.increaseVolume();
+      });
 
       // nextTrack
-      $(selector).delegate(selectors.next, 'click', strategy.playNextTrack);
+      $(selector).delegate(selectors.next, 'click', strategy.next);
 
       // previousTrack
       $(selector).delegate(selectors.previous, 'click', function () {
@@ -136,16 +144,22 @@
       // seekAhead / forward
       $(selector).delegate(selectors.forward, 'click', function (ev) {
         // TODO relative seek?
-        strategy.forward(positionStep);
+        strategy.seekAhead(positionStep);
       });
 
       // seekBehind / back
       $(selector).delegate(selectors.back, 'click', function (ev) {
-        strategy.back(positionStep);
+        strategy.seekBehind(positionStep);
       });
 
       // mute
-      $(selector).delegate(selectors.mute, 'click', strategy.muteTracks);
+      $(selector).delegate(selectors.mute, 'click', function () {
+        if (strategy.isMuted()) {
+          strategy.unmute();
+        } else {
+          strategy.mute();
+        }
+      });
 
       // TODO listen on play / pause
       $(selectors.play).show();

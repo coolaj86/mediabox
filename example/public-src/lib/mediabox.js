@@ -267,6 +267,7 @@
     }
 
     function playNext(enque) {
+      console.log('next was called from player-engine');
       var playlistEl = $(playlistSel)
         , playlistHistoryEl = $(playlistHistorySel)
         , playlistEls = $(playlistSel + ' ' + '.playlistitem')
