@@ -138,9 +138,17 @@
   }
 
   function removeDebugEvents(track) {
-    allMediaEvents.forEach(function (key) {
-      track.audio.removeEventListener(key, debugHandlers[key]);
-    });
+    var audio = track.audio
+      ;
+
+    function realRemoveEvents(key) {
+      var handler = debugHandlers[key]
+        ;
+
+      audio.removeEventListener(key, handler);
+    }
+
+    allMediaEvents.forEach(realRemoveEvents);
   }
 
   function removeEvents(track) {
@@ -148,9 +156,14 @@
       , audio = track.audio
       ;
 
-    Object.keys(events).forEach(function (key) {
-      audio.removeEventListener(key, events[key]);
-    });
+    function realRemove(key) {
+      var handler = events[key]
+        ;
+
+      audio.removeEventListener(key, handler);
+    }
+
+    Object.keys(events).forEach(realRemove);
   }
 
   function create(params) {
@@ -172,23 +185,27 @@
       , muteTime: params.muteTime || 150
       , muted: params.muted || false
       , unmuteTime: params.unmuteTime || 250
-      , crossfadeTime: params.crossfadeTime || 5 * 1000
+      , crossfadeTime: params.crossfadeTime || 5 // this is in seconds... duh
       , positionStep: params.positionStep || 5
     };
 
     function destroy(cb, track) {
-      console.log('[l] forward');
 
       function realDestroy() {
+        console.log('[destroy] track after fade');
+        console.log(track, track.audio);
         removeDebugEvents(track);
         track.audio.pause();
         track.currentTime = 0;
         track.audio.volume = toFloatVolume(settings.volume);
         // saving this in case the user wants to play the file again
-        track.href = audio.src;
-        track.audio.src = 'foo://cause-error (empties buffer)'
+        track.href = track.audio.src;
+        track.deleted = true;
+        track.audio.src = 'foo://cause-error (empties buffer)';
+        console.log('[delete the audio]');
         $(track.audio).remove();
         delete track.audio;
+        console.log('really really deleted');
         cb && cb();
       }
 
@@ -196,10 +213,13 @@
         cb && cb();
         return;
       }
+      console.log('[l] destroy');
 
       removeEvents(track);
 
       if (!track.audio.paused) {
+        console.log('[destroy] track before fade');
+        console.log(track.audio.paused, track.audio, track);
         // TODO use the pause() function ?
         fadeVolume(realDestroy, track.audio, 0, settings.pauseTime);
       } else {
@@ -209,7 +229,9 @@
 
     function promote() {
       console.log('[m] promote');
-      destroy(null, currentTrack);
+      if (currentTrack) {
+        destroy(null, currentTrack);
+      }
       currentTrack = upcomingTrack;
       addPlayEvents(currentTrack);
       emitter.emit('infoupdate', currentTrack);
@@ -222,15 +244,17 @@
       if (!track || (!track.audio && !track.href)) {
         throw new Error('You gave nothing to enque (or missing audio or href)');
       }
+      console.log('[n] enque', track.title);
 
       // if we're crossfading, the user must want us to stop
       // if we're not, the user must want to disregard the current 'next'
       if (upcomingTrack && !upcomingTrack.paused) {
-        console.log('[1] upcomingTrack');
+        console.log('[na] upcomingTrack');
         promote();
       } else {
-        console.log('[2] upcomingTrack');
+        console.log('[nb] upcomingTrack');
         destroy(null, upcomingTrack);
+        upcomingTrack = undefined;
       }
 
       // We prepare the new track to upcomingTrack
@@ -246,12 +270,12 @@
       $('body').append(upcomingTrack.audio);
 
       if (!currentTrack || playNextImmediately) {
-        console.log('[3] play now');
+        console.log('[nc] play now');
         playNextImmediately = false;
         promote(); // track -> currentTrack
         resume();
       } else {
-        console.log('[4] play later');
+        console.log('[nd] play later');
       }
     }
 
@@ -292,6 +316,7 @@
       // if upcomingTrack already exists, then play it now
       // otherwise, as soon as it loads play it
       if (upcomingTrack) {
+        console.log('next is calling resume');
         resume()
       } else {
         playNextImmediately = true;
@@ -307,13 +332,18 @@
 
     function addQueueEvents(track) {
       console.log('[r] addQ');
+
       function error() {
         emitter.emit('queueError', track);
-        destroy(null, track);
+        console.log('queue error');
+        if (!track.deleted) {
+          destroy(null, track);
+        }
         emitter.emit('next', enque);
       }
 
       if (track.audio.error) {
+        console.log('per-event error');
         error();
       }
 
@@ -322,8 +352,10 @@
     }
 
     function startCrossfade() {
-      console.log('[s] scf');
+      console.log('[s] crossfade');
       var crossfadeTime
+        , events = currentTrack.events
+        , audio = currentTrack.audio
         ;
 
       // no upcomingTrack, or upcomingTrack already playing
@@ -339,6 +371,7 @@
       }
 
       function emitChangeEvents() {
+        console.log('promoting fade-in, destroying fade-out');
         // currentTrack is the promoted currentTrack
         emitter.emit('volumechange', settings.volume);
         emitter.emit('rawvolumechange', settings.volume);
@@ -349,19 +382,23 @@
       // I can't remember what they are... but I was just thinking about it
       // anyway duration - time will be correct
       // ... a seek into the crossfade zone isone of them
-      crossfadeTime = currentTrack.duration - currentTrack.currentTime;
-      fadeVolume(null, currentTrack.audio, 0, crossfadeTime);
+      crossfadeTime = (audio.duration - audio.currentTime) * 1000;
+      console.log('crossfadeTime');
+      console.log(audio.duration, audio.currentTime);
+      fadeVolume(null, audio, 0, crossfadeTime);
 
       // TODO make sure upcomingTrack is loaded
       upcomingTrack.audio.play();
+      console.log(crossfadeTime);
       fadeVolume(emitChangeEvents, upcomingTrack.audio, toFloatVolume(settings.volume), crossfadeTime);
 
       // TODO fire ended event
-      currentTrack.audio.removeEventListener('error', currentTrack.events['error']);
-      currentTrack.audio.removeEventListener('end', currentTrack.events['end']);
+      audio.removeEventListener('error', events['error']);
+      audio.removeEventListener('end', events['end']);
 
-     removeEvents(upcomingTrack);
-      currentTrack.audio.volume = toFloatVolume(settings.muteVolume);
+      // removes the queue events
+      removeEvents(upcomingTrack);
+      //currentTrack.audio.volume = toFloatVolume(settings.muteVolume);
     }
 
     function addPlayEvents(track) {
@@ -393,11 +430,13 @@
       };
 
       events['timeupdate'] = function () {
-        if (this.duration - this.currentTime <= 7 && !currentTrack.fadeout) {
+        if ((this.duration - this.currentTime <= settings.crossfadeTime) && !currentTrack.fadeout) {
           currentTrack.fadeout = true;
+          console.log('timeupdate')
           startCrossfade();
           // TODO start fading
         }
+
         if (track.duration !== this.duration) {
           // BUG XXX TODO put on chrome mailing list
           // I've seen a bug many many times where the original
@@ -406,11 +445,12 @@
           track.duration = this.duration;
           emitter.emit('durationchange', this.duration);
         }
+
         emitter.emit('timeupdate', this, null, this.currentTime, this.duration);
       };
 
-      events['ended'] = next;
-      events['error'] = next;
+      //events['ended'] = next;
+      //events['error'] = next;
 
       Object.keys(currentTrack.events).forEach(function (key) {
         currentTrack.audio.addEventListener(key, currentTrack.events[key]);
@@ -440,20 +480,24 @@
         return;
       }
 
-      // chrome has a bug where every resume from pause results in an audio
-      // "pop" sometime during the first 1000ms and this is a lousy hack to fix that
-      if (currentTrack.audio.currentTime > 1.5) {
-        currentTrack.audio.currentTime -= 1.5;
-      // throws DOM exception if 0 is set to 0 (or perhaps just if play() hasn't happened yet)
-      } else if (currentTrack.audio.currentTime) {
-        currentTrack.audio.currentTime = 0;
-      }
-
       // TODO unmute?
       currentTrack.audio.volume = 0;
+      if (0 === currentTrack.audio.currentTime) {
+        //process.nextTick(postPopResume);
+        setTimeout(postPopResume, 0);
+      } else {
+        // chrome has a bug where every resume from pause results in an audio
+        // "pop" sometime during the first 1000ms and this is a lousy hack to fix that
+        if (currentTrack.audio.currentTime > 1.5) {
+          currentTrack.audio.currentTime -= 1.5;
+        // throws DOM exception if 0 is set to 0 (or perhaps just if play() hasn't happened yet)
+        } else if (currentTrack.audio.currentTime) {
+          currentTrack.audio.currentTime = 0;
+        }
+        setTimeout(postPopResume, 750);
+      }
       currentTrack.audio.play();
       emitter.emit('resume');
-      setTimeout(postPopResume, 750);
     }
 
     function stopCrossfade(cb, ms) {
@@ -599,7 +643,6 @@
     }
 
     function seek(time) {
-      console.log('[i] seek=');
       if (upcomingTrack && !upcomingTrack.audio.paused) {
         promote();
       }
@@ -621,7 +664,6 @@
     }
 
     function forward(ms) {
-      console.log('[j] seek+');
       if (upcomingTrack && !upcomingTrack.audio.paused) {
         promote();
       }
@@ -630,7 +672,6 @@
 
     // back
     function back(ms) {
-      console.log('[k] seek-');
       function upcomingTrackBack() {
         if (!upcomingTrack) {
           return;

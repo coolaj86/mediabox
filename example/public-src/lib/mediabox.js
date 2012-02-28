@@ -289,7 +289,7 @@
         playlistHistoryEl.append(nowPlaying.el);
         // in case the memory from the file
         // doesn't get cleaned up automatically
-        delete nowPlaying.audio;
+        //delete nowPlaying.audio;
       }
       // this one just just started now
       nowPlaying = playlist.shift();
