@@ -235,6 +235,7 @@
       currentTrack = upcomingTrack;
       addPlayEvents(currentTrack);
       emitter.emit('infoupdate', currentTrack);
+      currentTrack.events['progress']();
       upcomingTrack = undefined;
       emitter.emit('next', enque);
     }
@@ -408,11 +409,16 @@
         ;
         
       events['progress'] = function () {
+        var self = track.audio
+          ;
+
         // TODO return the buffers in a sane fashion
         // this.buffered.length
         // this.buffered.start(i)
         // this.buffered.end(i)
-        emitter.emit('progress', this, null, this.buffered.start(0), this.buffered.end(0));
+        if (self.buffered.length) {
+          emitter.emit('progress', self, null, self.buffered.start(0), self.buffered.end(0));
+        }
       };
 
       events['suspend'] = function () {
@@ -425,7 +431,10 @@
       };
 
       events['durationchange'] = function () {
-        currentTrack.duration = this.duration;
+        var self = track.audio
+          ;
+
+        track.duration = currentTrack.duration = self.duration;
         emitter.emit('durationchange', this, null, currentTrack.duration);
       };
 
