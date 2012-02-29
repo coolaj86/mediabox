@@ -235,7 +235,13 @@
       currentTrack = upcomingTrack;
       addPlayEvents(currentTrack);
       emitter.emit('infoupdate', currentTrack);
-      currentTrack.events['progress']();
+      emitter.emit('volumechange', settings.volume);
+      if (currentTrack.audio.duration) {
+        currentTrack.events['durationchange']();
+      }
+      if (currentTrack.audio.buffered.length) {
+        currentTrack.events['progress']();
+      }
       upcomingTrack = undefined;
       emitter.emit('next', enque);
     }
@@ -435,7 +441,7 @@
           ;
 
         track.duration = currentTrack.duration = self.duration;
-        emitter.emit('durationchange', this, null, currentTrack.duration);
+        emitter.emit('durationchange', self, null, track.duration);
       };
 
       events['timeupdate'] = function () {

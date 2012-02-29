@@ -67,7 +67,7 @@
 
     function updateInfo(a, b) {
       // prefer the song being crossfaded
-      a = b || a;
+      // a = b || a;
       $(selectors.title).text(a.title || "Uknown Track");
       $(selectors.artist).text(a.artist || "Uknown Artist");
       $(selectors.album).text(a.album || "Uknown Album");
@@ -82,7 +82,7 @@
 
     function updateDuration(a, b) {
       // prefer the song being crossfaded
-      a = b || a;
+      //a = b || a;
       $(selectors.buffer).attr('max', a.duration);
       // TODO use real current value
       $(selectors.buffer).attr('value', 0);
@@ -96,7 +96,7 @@
 
     function updateTime(a, b) {
       // prefer the song being crossfaded
-      a = b || a;
+      //a = b || a;
       $(selectors.progress).attr('value', a.currentTime);
       $(selectors.playtimePassed).text(toTime(Math.floor(a.duration) - Math.floor(a.currentTime)));
       $(selectors.playtime).text(toTime(a.currentTime));
