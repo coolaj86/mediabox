@@ -288,10 +288,24 @@
       // the crossfade should finish before the next is loaded
       if (nowPlaying) {
         playlistHistoryEl.append(nowPlaying.el);
+
+        nowPlaying.extent = store.get(nowPlaying.fileMd5sum) || { playCount: 0 };
+        // TODO check playranges
+        nowPlaying.extent.playCount += 1;
+        nowPlaying.plays = nowPlaying.plays || [];
+        nowPlaying.plays.push(Date.now());
+        // TODO add location
+        nowPlaying.extent.rating = nowPlaying.rating;
+        nowPlaying.extent.category = nowPlaying.category;
+        nowPlaying.extent.style = nowPlaying.style;
+        store.set(nowPlaying.fileMd5sum, nowPlaying.extent);
+
         // in case the memory from the file
         // doesn't get cleaned up automatically
+        // TODO player-engine should make a copy of the object
         //delete nowPlaying.audio;
       }
+
       // this one just just started now
       nowPlaying = playlist.shift();
       if (nowPlaying) {
@@ -301,6 +315,27 @@
       tags.sort(randomize);
       while ($(playlistSel + ' ' + '.playlistitem').length < queueMinimum) {
         tag = tags.pop();
+
+        // just play unrated songs for now
+        tag.extent = store.get(tag.fileMd5sum);
+        if (tag.extent) {
+          Object.keys(tag.extent).forEach(function (key) {
+            tag[key] = tag.extent[key];
+          });
+          if ('rating' in tag.extent) {
+            console.log('took already-rated song out of random');
+            continue;
+          }
+          if ('category' in tag.extent && 'music' !== tag.extent.category) {
+            console.log('took not-music song out of random');
+            continue;
+          }
+          if ('style' in tag.extent && '~special' === tag.extent.style) {
+            console.log('took specialty song out of random');
+            continue;
+          }
+        }
+
         tags.unshift(tag);
         // adds el, audio, and md5sum
         addToPlaylist(tag);

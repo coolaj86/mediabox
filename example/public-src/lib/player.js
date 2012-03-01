@@ -60,6 +60,8 @@
           , "thumbsUp": selector + '.mb-thumbs-up'
           , "thumbsDown": selector + '.mb-thumbs-down'
           , "ratingImg": selector + '.mb-rating-img'
+          , "tagAsSpecialtyMusic": selector + '.mb-specialty-music'
+          , "tagAsNotMusic": selector + '.mb-not-music'
         }
       , ratingImgs = {
             "NaN": "images/rating+0.png"
@@ -158,6 +160,19 @@
 
       $(selector).delegate(selectors.thumbsUp, 'click', strategy.thumbsUp);
       $(selector).delegate(selectors.thumbsDown, 'click', strategy.thumbsDown);
+
+      $(selector).delegate(selectors.tagAsNotMusic, 'click', function () {
+        var track = strategy.getCurrent()
+          ;
+
+        track.category = '!music';
+      });
+      $(selector).delegate(selectors.tagAsSpecialtyMusic, 'click', function () {
+        var track = strategy.getCurrent()
+          ;
+
+        track.style = '~special';
+      });
 
       // TODO seek for slider
       // TODO get duration from strategy
