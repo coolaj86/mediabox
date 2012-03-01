@@ -106,6 +106,7 @@
     // NOTE the file-chooser doesn't work if the content area is hidden and then .show()n
     Updrop.create(handleLocalLoad, '#local-drop-container', '#local-dropzone');
     Updrop.create(handleUpload, '#drop-container', '#dropzone');
+
     abstracter = Updrop.abstract(handleUpload);
     $('body').bind('dragover', Updrop.handleDrag);
     $('body').bind('drop', abstracter);
