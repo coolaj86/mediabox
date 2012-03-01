@@ -137,6 +137,10 @@
     return Number(n.toFixed(3));
   }
 
+  function sanatizeRating(r) {
+    return Math.min(Math.max(-2, parseInt(r, 10)), 2) || null;
+  }
+
   function removeDebugEvents(track) {
     var audio = track.audio
       ;
@@ -188,6 +192,19 @@
       , crossfadeTime: params.crossfadeTime || 5 // this is in seconds... duh
       , positionStep: params.positionStep || 5
     };
+
+    function thumbsUp() {
+      rating((sanatizeRating(currentTrack.rating) || 0) + 1);
+    }
+
+    function thumbsDown() {
+      rating((sanatizeRating(currentTrack.rating) || 0) - 1);
+    }
+
+    function rating(r) {
+      currentTrack.rating = r;
+      emitter.emit('ratingchange', r);
+    }
 
     function destroy(cb, track) {
 
@@ -735,6 +752,9 @@
     emitter.decreaseVolume = decreaseVolume;
     emitter.increaseVolume = increaseVolume;
     emitter.mute = mute;
+    emitter.thumbsUp = thumbsUp;
+    emitter.thumbsDown = thumbsDown;
+    emitter.rating = rating;
     emitter.unmute = unmute;
     emitter.isMuted = function () {
       return settings.muted;

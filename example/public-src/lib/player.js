@@ -57,6 +57,17 @@
           , "artist": selector + '.mb-artist'
           , "album": selector + '.mb-album'
           , "buffering": selector + '.mb-buffering'
+          , "thumbsUp": selector + '.mb-thumbs-up'
+          , "thumbsDown": selector + '.mb-thumbs-down'
+          , "ratingImg": selector + '.mb-rating-img'
+        }
+      , ratingImgs = {
+            "NaN": "images/rating+0.png"
+          , "-1": "images/rating-1.png"
+          , "-2": "images/rating-2.png"
+          , "0": "images/rating+0.png"
+          , "1": "images/rating+1.png"
+          , "2": "images/rating+2.png"
         }
       , defaultVolume = 1
       // these two are given separate names for semantic integrity
@@ -65,12 +76,19 @@
       , fadeTimeout
       ;
 
+    function setRatingImage(r) {
+      r = Math.min(Math.max(-2, parseInt(r, 10)), 2);
+      $(selectors.ratingImg).attr('src', ratingImgs[r]);
+      return r;
+    }
+
     function updateInfo(a, b) {
       // prefer the song being crossfaded
       // a = b || a;
       $(selectors.title).text(a.title || "Uknown Track");
       $(selectors.artist).text(a.artist || "Uknown Artist");
       $(selectors.album).text(a.album || "Uknown Album");
+      setRatingImage(a.rating);
     }
 
     function updateRawVolume(volume) {
@@ -138,6 +156,9 @@
         alert("Hey! :-)   Thanks for trying out the 'previous' button.... but it doesn't work yet.");
       });
 
+      $(selector).delegate(selectors.thumbsUp, 'click', strategy.thumbsUp);
+      $(selector).delegate(selectors.thumbsDown, 'click', strategy.thumbsDown);
+
       // TODO seek for slider
       // TODO get duration from strategy
 
@@ -175,6 +196,7 @@
         $(selectors.play).hide();
       });
 
+      strategy.on('ratingchange', setRatingImage);
       strategy.on('durationchange', updateDuration);
       strategy.on('volumechange', updateVolume);
       strategy.on('rawvolumechange', updateRawVolume);

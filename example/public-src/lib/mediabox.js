@@ -17,6 +17,7 @@
     , playlistSel = '.mb-playlist'
     , playlistHistorySel = '.mb-playlist-history'
     , queueMinimum = 3
+    , store = require('json-storage')(require('localStorage'))
     ;
 
   function basename(path, ext) {
