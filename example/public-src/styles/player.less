@@ -1,6 +1,18 @@
+#big_player {
+  width: 100%;
+  display: block;
+  margin: 0;
+  height: 110px;
+  #npwrapper {
+    margin: 0 auto;
+    padding: 10px 0;
+  }
+}
+
 .css-mb-leftbox {
   float: left;
 }
+
 .css-mb-rightbox {
   float: left;
 }
@@ -8,10 +20,49 @@
 .css-mb-rating-img {
   width: 24px;
   height: 24px;
-  background-color: ghostwhite;
+  background-color: rgba(255,255,255,1);
+  border: none;
+  padding: 2px 0 0 0;
+  border-radius: 4px;
 }
 
 .css-mb-thumb-img {
   width: 16px;
   height: 16px;
+}
+
+.css-playtimes {
+  font-family: 'Prosto One', sans-serif;
+  padding-left: 0.3em;
+  width: 2.9em;
+  display: inline-block;
+}
+
+.css-buffer {
+  /* 
+  // Tried stacked progress bars. It was really neat, but not functional once
+  // you started scrolling...
+  opacity: 0.4;
+  position: fixed;
+  top: 1.82em;
+  left: 3.59em;
+  */
+}
+
+.css-progress {
+
+}
+
+.css-thumbs {
+  padding: 3px 0 0 0;
+}
+
+.css-now-playing {
+  font-family: 'Bree Serif', sans-serif;
+  list-style: square outside;
+}
+
+.css-buffering-spinny {
+  position: fixed;
+  right: 0px;
 }

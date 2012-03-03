@@ -3,39 +3,34 @@
     span.mb-audios
     button.mb-play |>
     button.mb-pause ||
-    progress.mb-buffer
-    button.mb-thumbs-down
+    progress.css-buffer.mb-buffer
+    button.css-thumbs.mb-thumbs-down
       img.css-mb-thumb-img(src='images/thumbs-down.png')
-    button.mb-thumbs-up
+    button.css-thumbs.mb-thumbs-up
       img.css-mb-thumb-img(src='images/thumbs-up.png')
     button.css-mb-rating-img
       img.mb-rating-img(src='images/rating+0.png')
     //- for things such as audio books and podcasts
-    button.mb-not-music
-      | Not Music (ie: ebook, podcast)
+    button.mb-not-music(title="Audio Book, Podcast, Goat Noises, etc")
+      | Not Music
     //- for things such as chicken dance, christmas music, hymns, and such
-    button.mb-specialty-music
-      | Special (ie: limbo, christmas, hymn)
-    span.mb-buffering
+    button.mb-specialty-music(title="Chicken Dance, Christmas, Hymn, etc")
+      | Special
+    span.css-buffering-spinny.mb-buffering
       img(src='/images/loading.gif')
     br
     button.mb-previous <<
-      | &nbsp;
     button.mb-pos-back <
-    progress.mb-progress
+    progress.css-progress.mb-progress
     button.mb-pos-forward >
-      | &nbsp;
     button.mb-next >>
     br
-    span.mb-playtime-passed
+    span.css-playtimes.mb-playtime-passed
       | 0:00
-    span &nbsp;
-    span.mb-playtime-total
+    span.css-playtimes.mb-playtime-total
       | 0:00
-    span &nbsp;
-    span.mb-playtime
+    span.css-playtimes.mb-playtime
       | 0:00
-    span &nbsp;
     br
     button.mb-vol-up +Vol
     button.mb-vol-down -Vol
@@ -44,7 +39,7 @@
     input(type="range").mb-volume-raw(min="0", max="1000", disabled="disabled")
     div.mb-art
   .css-mb-rightbox
-    ul
+    ul.css-now-playing
       li.mb-title
       li.mb-artist
       li.mb-album
