@@ -38,19 +38,55 @@
   display: inline-block;
 }
 
-.css-buffer {
+.less-hybrid-progress-container {
+  position: relative;
+  display: inline-block;
+  height: 1em;
+  border: solid 1px black;
+}
+
+.less-hybrid-progress {
+  position: absolute;
+}
+.less-hybrid-progress-lower {
+  .less-hybrid-progress;
+  opacity: 0.6;
+}
+
+.css-volume-level {
+  .less-hybrid-progress-container;
+  width: 150px;
+  .css-level {
+    .less-hybrid-progress;
+    width: 150px;
+  }
+  .css-level-raw {
+    .less-hybrid-progress-lower;
+    width: 150px;
+  }
+}
+
+
+.css-audio-progress {
+  .less-hybrid-progress-container;
+  width: 250px;
+}
+
+.css-progress-buffer {
+  .less-hybrid-progress-lower;
+  width: 250px;
   /* 
   // Tried stacked progress bars. It was really neat, but not functional once
   // you started scrolling...
-  opacity: 0.4;
   position: fixed;
   top: 1.82em;
   left: 3.59em;
   */
 }
 
-.css-progress {
-
+.css-progress-audio {
+  .less-hybrid-progress;
+  width: 250px;
 }
 
 .css-thumbs {
