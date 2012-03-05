@@ -189,8 +189,8 @@
       , muteTime: params.muteTime || 150
       , muted: params.muted || false
       , unmuteTime: params.unmuteTime || 250
-      , crossfadeTime: params.crossfadeTime || 5 // this is in seconds... duh
-      , positionStep: params.positionStep || 5
+      , crossfadeTime: params.crossfadeTime || 5 * 1000 // this is in seconds... duh
+      , positionStep: params.positionStep || 5 * 1000
     };
 
     function thumbsUp() {
@@ -458,11 +458,11 @@
           ;
 
         track.duration = currentTrack.duration = self.duration;
-        emitter.emit('durationchange', self, null, track.duration);
+        emitter.emit('durationchange', self, null, track.duration * 1000);
       };
 
       events['timeupdate'] = function () {
-        if ((this.duration - this.currentTime <= settings.crossfadeTime) && !currentTrack.fadeout) {
+        if ((this.duration - this.currentTime <= (settings.crossfadeTime / 1000)) && !currentTrack.fadeout) {
           currentTrack.fadeout = true;
           console.log('timeupdate')
           startCrossfade();
@@ -675,6 +675,7 @@
     }
 
     function seek(time) {
+      time = (time / 1000);
       if (upcomingTrack && !upcomingTrack.audio.paused) {
         promote();
       }

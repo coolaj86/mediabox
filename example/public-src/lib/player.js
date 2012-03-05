@@ -137,7 +137,7 @@
 
       // seek
       function seek() {
-        var position = $(selectors.progress).val() / 100
+        var position = $(selectors.progress).val()
         strategy.seek(position);
       }
       $(selector).delegate(selectors.progress, 'change', seek);
