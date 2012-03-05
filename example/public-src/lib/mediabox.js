@@ -289,11 +289,11 @@
       if (nowPlaying) {
         playlistHistoryEl.append(nowPlaying.el);
 
-        nowPlaying.extent = store.get(nowPlaying.fileMd5sum) || { playCount: 0 };
+        nowPlaying.extent = store.get(nowPlaying.fileMd5sum) || { playCount: 0, plays: [] };
         // TODO check playranges
         nowPlaying.extent.playCount += 1;
-        nowPlaying.plays = nowPlaying.plays || [];
-        nowPlaying.plays.push(Date.now());
+        nowPlaying.extent.plays = nowPlaying.extent.plays || [];
+        nowPlaying.extent.plays.push(Date.now());
         // TODO add location
         nowPlaying.extent.rating = nowPlaying.rating;
         nowPlaying.extent.category = nowPlaying.category;
