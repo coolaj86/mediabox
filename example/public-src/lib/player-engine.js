@@ -700,32 +700,37 @@
       if (upcomingTrack && !upcomingTrack.audio.paused) {
         promote();
       }
-      seek(currentTrack.audio.currentTime + (ms || settings.positionStep));
+      seek((currentTrack.audio.currentTime * 1000) + (ms || settings.positionStep));
     }
 
     // back
     function back(ms) {
       function upcomingTrackBack() {
         if (!upcomingTrack) {
+          // must be crossfading
           return;
         }
         upcomingTrack.audio.pause();
         upcomingTrack.audio.currentTime = 0;
         if (currentTrack) {
-          seek(currentTrack.audio.currentTime - (ms || settings.positionStep));
+          seek((currentTrack.audio.currentTime * 1000) - (ms || settings.positionStep));
         }
       }
 
-      if (!currentTrack) {
-        return
+      function currentTrackBack() {
+        if (!currentTrack) {
+          return
+        }
+
+        if (upcomingTrack && !upcomingTrack.audio.paused) {
+          fadeOut(upcomingTrackBack, upcomingTrack.audio, 0, settings.muteTime);
+          return;
+        }
+
+        seek((currentTrack.audio.currentTime * 1000) - (ms || settings.positionStep));
       }
 
-      if (upcomingTrack && !upcomingTrack.audio.paused) {
-        fadeOut(upcomingTrackBack, upcomingTrack.audio, 0, settings.muteTime);
-        return;
-      }
-
-      seek(currentTrack.audio.currentTime - (ms || settings.positionStep));
+      currentTrackBack();
     }
 
     //
