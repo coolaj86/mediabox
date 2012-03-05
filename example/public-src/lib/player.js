@@ -46,7 +46,7 @@
           , "back": '.mb-pos-back'
           , "tracklist": selector + '.mb-audios'
           , "playtimeTotal": selector + '.mb-playtime-total'
-          , "playtimePassed": selector + '.mb-playtime-passed'
+          , "playtimeRemaining": selector + '.mb-playtime-remaining'
           , "playtime": selector + '.mb-playtime'
           , "progress": selector + '.mb-progress'
           , "buffer": selector + '.mb-buffer'
@@ -73,8 +73,7 @@
         }
       , defaultVolume = 1
       // these two are given separate names for semantic integrity
-      , volumeStep = 0.05
-      , positionStep = 5
+      , positionStep = 5 * 1000
       , fadeTimeout
       ;
 
@@ -105,10 +104,10 @@
       //a = b || a;
       $(selectors.buffer).attr('max', a.duration);
       // TODO use real current value
-      $(selectors.buffer).attr('value', 0);
+      //$(selectors.buffer).attr('value', 0);
 
-      $(selectors.progress).attr('max', a.duration);
-      $(selectors.progress).attr('value', a.currentTime);
+      $(selectors.progress).attr('max', a.duration * 1000);
+      $(selectors.progress).attr('value', a.currentTime * 1000);
 
       $(selectors.duration).text(toTime(a.duration));
       $(selectors.playtimeTotal).text(toTime(a.duration));
@@ -117,8 +116,8 @@
     function updateTime(a, b) {
       // prefer the song being crossfaded
       //a = b || a;
-      $(selectors.progress).attr('value', a.currentTime);
-      $(selectors.playtimePassed).text(toTime(Math.floor(a.duration) - Math.floor(a.currentTime)));
+      $(selectors.progress).attr('value', a.currentTime * 1000);
+      $(selectors.playtimeRemaining).text(toTime(Math.floor(a.duration) - Math.floor(a.currentTime)));
       $(selectors.playtime).text(toTime(a.currentTime));
     }
 
@@ -135,6 +134,13 @@
 
       // play / resume
       $(selector).delegate(selectors.play, 'click', strategy.resume);
+
+      // seek
+      function seek() {
+        var position = $(selectors.progress).val() / 100
+        strategy.seek(position);
+      }
+      $(selector).delegate(selectors.progress, 'change', seek);
 
       // pause
       $(selector).delegate(selectors.pause, 'click', strategy.pause);
