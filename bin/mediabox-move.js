@@ -2,6 +2,7 @@
   "use strict";
 
   var fs = require('fs')
+    , path = require('path')
     , walk = require('walk')
     , crypto = require('crypto')
     , request = require('ahr2')
@@ -129,6 +130,10 @@
 
     console.log(path);
   }
+
+  paths.forEach(function (pathname, i) {
+    paths[i] = path.resolve(process.cwd(), pathname);
+  });
 
   forEachAsync(paths, movePaths).then(function () {
     console.log('all files uploaded');
