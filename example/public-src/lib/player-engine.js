@@ -250,6 +250,7 @@
         destroy(null, currentTrack);
       }
       currentTrack = upcomingTrack;
+      upcomingTrack = undefined;
       addPlayEvents(currentTrack);
       emitter.emit('infoupdate', currentTrack);
       emitter.emit('volumechange', settings.volume);
@@ -259,7 +260,6 @@
       if (currentTrack.audio.buffered.length) {
         currentTrack.events['progress']();
       }
-      upcomingTrack = undefined;
       emitter.emit('next', enque);
     }
 
@@ -362,6 +362,11 @@
         console.log('queue error');
         if (!track.deleted) {
           destroy(null, track);
+          if (track === currentTrack) {
+            promote();
+          } else if (track === upcomingTrack) {
+            upcomingTrack = undefined;
+          }
         }
         emitter.emit('next', enque);
       }
