@@ -6,18 +6,16 @@
     , targetInfo = require('./target-info')
     , tags
     , playerSel = '.mb-player'
-    , playlistItemSel = playlistSel + ' .playlistitem'
-    , playlistItemAudio = playlistSel + ' audio'
     , strategy = require('./player-engine').create()
-    , player = require('./player').create('.mb-player', strategy)
-    , backupPlaylist = []
-    , playlist = []
-    , nowPlaying
-    , playlistHistory = []
-    , playlistSel = '.mb-playlist'
-    , playlistHistorySel = '.mb-playlist-history'
-    , queueMinimum = 3
-    , store = require('json-storage')(require('localStorage'))
+    , Player = require('./player')
+    , player = Player.create('.mb-player', strategy)
+    // TODO previewer
+    , playHistorySel = '.mb-playlist-history'
+    , localStorage = require('localStorage')
+    , store = require('json-storage')(localStorage)
+    , historyStore = require('json-storage')(localStorage, 'h')
+    , PlayQueue = require('./play-queue').PlayQueue
+    , playQueue
     ;
 
   function basename(path, ext) {
@@ -247,104 +245,31 @@
       tag.el = $(
         "<tr data-md5sum='" + md5sum + "' class='has-md5sum playlistitem'>" +
           "<td class='add'>" +
-            "<a class='ui-action' href='" + resource + "'>[+]</a>   " +
+            "<button class='ui-action'>+</button>   " +
           "</td>" +
           "<td class='play'>" +
-            "<a class='ui-action' href='" + resource + "'>[play now]</a>   " +
+            "<button class='ui-action'>|></button>   " +
+          "</td>" +
+          "<td class='promote'>" +
+            "<button class='ui-action'>&uarr;</button>   " +
+          "</td>" +
+          "<td class='demote'>" +
+            "<button class='ui-action'>&darr;</button>   " +
           "</td>" +
           "<td class='title'>" + tag.title + "</td>" +
           "<td class='artist'>" + tag.artist + "</td>" +
           "<td class='album'>" + tag.album + "</td>" +
+          "<td class='remove'>" +
+            "<button class='ui-action'>X</button>   " +
           "</td>" +
         "</tr>"
       );
     }
 
-    function addToPlaylist(tag) {
-      createDomForTag(tag);
-      playlist.push(tag);
-      $(playlistSel).append(tag.el);
-      tag.audio.preload = 'metadata';
-    }
-
     function playNext(enque) {
+      // preserve this-ness
       console.log('next was called from player-engine');
-      var playlistEl = $(playlistSel)
-        , playlistHistoryEl = $(playlistHistorySel)
-        , playlistEls = $(playlistSel + ' ' + '.playlistitem')
-        , tag
-        ;
-
-      if (!playlistEl || !playlistEl.length) {
-        alert('could not find playlist in dom ' + playlistSel);
-        return;
-      }
-
-      if (!playlistEls) {
-        alert('found playlist, but couldn\'t select items in dom ' + playlistSel);
-        return;
-      }
-      
-      // the crossfade should finish before the next is loaded
-      if (nowPlaying) {
-        playlistHistoryEl.append(nowPlaying.el);
-
-        nowPlaying.extent = store.get(nowPlaying.fileMd5sum) || { playCount: 0 };
-        // TODO check playranges
-        nowPlaying.extent.playCount += 1;
-        nowPlaying.plays = nowPlaying.plays || [];
-        nowPlaying.plays.push(Date.now());
-        // TODO add location
-        nowPlaying.extent.rating = nowPlaying.rating;
-        nowPlaying.extent.category = nowPlaying.category;
-        nowPlaying.extent.style = nowPlaying.style;
-        store.set(nowPlaying.fileMd5sum, nowPlaying.extent);
-
-        // in case the memory from the file
-        // doesn't get cleaned up automatically
-        // TODO player-engine should make a copy of the object
-        //delete nowPlaying.audio;
-      }
-
-      // this one just just started now
-      nowPlaying = playlist.shift();
-      if (nowPlaying) {
-        playlistHistory.push(nowPlaying);
-      }
-
-      tags.sort(randomize);
-      while ($(playlistSel + ' ' + '.playlistitem').length < queueMinimum) {
-        tag = tags.pop();
-
-        // just play unrated songs for now
-        tag.extent = store.get(tag.fileMd5sum);
-        if (tag.extent) {
-          Object.keys(tag.extent).forEach(function (key) {
-            tag[key] = tag.extent[key];
-          });
-          if ('rating' in tag.extent) {
-            console.log('took already-rated song out of random');
-            continue;
-          }
-          if ('category' in tag.extent && 'music' !== tag.extent.category) {
-            console.log('took not-music song out of random');
-            continue;
-          }
-          if ('style' in tag.extent && '~special' === tag.extent.style) {
-            console.log('took specialty song out of random');
-            continue;
-          }
-        }
-
-        tags.unshift(tag);
-        // adds el, audio, and md5sum
-        addToPlaylist(tag);
-      }
-
-      // this is up next
-      enque(playlist[0]);
-      // and this is next next
-      playlist[1].audio.preload = 'auto';
+      playQueue.enque(enque)
     }
 
     function onPlayNow(ev) {
@@ -352,33 +277,39 @@
 
       var el = $(ev.target).closest('.has-md5sum')
         , md5sum = el[0].dataset.md5sum
-        , inPlaylist
         ;
 
-      inPlaylist = playlist.some(function (tag) {
-        var result
-          ;
-        // this is already in the playlist
-        if (md5sum === tag.md5sum) {
-          console.log('item is in the playlist. yahoo');
-          // TODO $('')
-          result = true;
-        }
-
-        if (el[0] === tag.el[0]) {
-          console.log('item is in the dom. yahoo');
-          result = true;
-        }
-
-        return result;
-      });
-
-      if (!inPlaylist) {
-        console.log("wasn't in playlist");
-      } else {
-        console.log("was in playlist");
-      }
       console.log("not doing anything about it for now...");
+    }
+
+    function onPromoteInPlaylist(ev) {
+      ev.preventDefault();
+
+      var el = $(ev.target).closest('.has-md5sum')
+        , md5sum = el[0].dataset.md5sum
+        ;
+
+      el.previous().after(el);
+    }
+
+    function onDemoteInPlaylist(ev) {
+      ev.preventDefault();
+
+      var el = $(ev.target).closest('.has-md5sum')
+        , md5sum = el[0].dataset.md5sum
+        ;
+
+      el.after(el.previous());
+    }
+
+    function onRemoveFromPlaylist(ev) {
+      ev.preventDefault();
+
+      var el = $(ev.target).closest('.has-md5sum')
+        , md5sum = el[0].dataset.md5sum
+        ;
+
+      el.remove();
     }
 
     function onAddToPlaylist(ev) {
@@ -392,7 +323,7 @@
       inTags = tags.some(function (tag) {
         if (tag.fileMd5sum === md5sum) {
           console.log('yahoo, found a search item');
-          addToPlaylist(tag);
+          playQueue.add(tag);
           return true;
         }
       });
@@ -426,6 +357,8 @@
       $('#content').show();
       tags = data.result;
       tags.sort(randomize);
+      PlayQueue.init(tags, createDomForTag);
+      playQueue = new PlayQueue();
     });
   }
 
@@ -435,16 +368,11 @@
     $('body').delegate('form#search-library', 'submit', handleSearch);
     $('body').delegate('form#search', 'submit', handleSearch);
     $('body').delegate('form#search', 'webkitspeechchange', handleSearch);
+    $('body').delegate('.promote .ui-action', 'click', onPromoteInPlaylist);
+    $('body').delegate('.demote .ui-action', 'click', onDemoteInPlaylist);
+    $('body').delegate('.remove .ui-action', 'click', onRemoveFromPlaylist);
     $('body').delegate('.add .ui-action', 'click', onAddToPlaylist);
     $('body').delegate('.play .ui-action', 'click', onPlayNow);
-
-    /*
-    var tag = tags.pop()
-      ;
-    tags.unshift(tag);
-    addToPlaylist(tag);
-    player.enque(tag);
-    */
   }
 
   getTagDb();

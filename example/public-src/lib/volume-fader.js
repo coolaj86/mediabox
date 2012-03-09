@@ -17,6 +17,7 @@
     var diff = sanitize(newVol - audio.volume)
       , numSteps = Math.floor(time / timestep) || 1
       , increment
+      , fadeCompletesAt = Date.now()
       ;
 
     if (!(newVol <= maxVol && newVol >= minVol)) {
@@ -36,6 +37,14 @@
     // IEEE floating point bug
     increment = sanitize(diff / numSteps);
 
+    function reFade() {
+      var timeLeft = time - Math.max(0, (Date.now() - fadeCompletesAt))
+        ;
+
+      console.log('refading');
+      fadeVolume(cb, audio, newVol, timeLeft, zeroed);
+    }
+
     function stepVol() {
       if (
         !increment // === 0
@@ -44,15 +53,17 @@
         ||
         increment < 0 && audio.volume + increment <= newVol
       ) {
+        console.log('reached target level');
         audio.volume = sanitize(newVol);
         clearInterval(audio.mbVolumeStepToken);
         cb && cb();
         return;
       } 
       audio.volume = sanitize(audio.volume + increment);
+      audio.mbVolumeStepToken = setTimeout(reFade, timestep);
     }
 
-    audio.mbVolumeStepToken = setInterval(stepVol, timestep);
+    stepVol();
   }
 
   module.exports = fadeVolume;

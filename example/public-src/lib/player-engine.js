@@ -189,8 +189,8 @@
       , muteTime: params.muteTime || 150
       , muted: params.muted || false
       , unmuteTime: params.unmuteTime || 250
-      , crossfadeTime: params.crossfadeTime || 5 // this is in seconds... duh
-      , positionStep: params.positionStep || 5
+      , crossfadeTime: params.crossfadeTime || 5 * 1000 // this is in seconds... duh
+      , positionStep: params.positionStep || 5 * 1000
     };
 
     function thumbsUp() {
@@ -250,6 +250,7 @@
         destroy(null, currentTrack);
       }
       currentTrack = upcomingTrack;
+      upcomingTrack = undefined;
       addPlayEvents(currentTrack);
       emitter.emit('infoupdate', currentTrack);
       emitter.emit('volumechange', settings.volume);
@@ -259,7 +260,6 @@
       if (currentTrack.audio.buffered.length) {
         currentTrack.events['progress']();
       }
-      upcomingTrack = undefined;
       emitter.emit('next', enque);
     }
 
@@ -362,6 +362,11 @@
         console.log('queue error');
         if (!track.deleted) {
           destroy(null, track);
+          if (track === currentTrack) {
+            promote();
+          } else if (track === upcomingTrack) {
+            upcomingTrack = undefined;
+          }
         }
         emitter.emit('next', enque);
       }
@@ -458,11 +463,11 @@
           ;
 
         track.duration = currentTrack.duration = self.duration;
-        emitter.emit('durationchange', self, null, track.duration);
+        emitter.emit('durationchange', self, null, track.duration * 1000);
       };
 
       events['timeupdate'] = function () {
-        if ((this.duration - this.currentTime <= settings.crossfadeTime) && !currentTrack.fadeout) {
+        if ((this.duration - this.currentTime <= (settings.crossfadeTime / 1000)) && !currentTrack.fadeout) {
           currentTrack.fadeout = true;
           console.log('timeupdate')
           startCrossfade();
@@ -675,6 +680,7 @@
     }
 
     function seek(time) {
+      time = (time / 1000);
       if (upcomingTrack && !upcomingTrack.audio.paused) {
         promote();
       }
@@ -699,32 +705,37 @@
       if (upcomingTrack && !upcomingTrack.audio.paused) {
         promote();
       }
-      seek(currentTrack.audio.currentTime + (ms || settings.positionStep));
+      seek((currentTrack.audio.currentTime * 1000) + (ms || settings.positionStep));
     }
 
     // back
     function back(ms) {
       function upcomingTrackBack() {
         if (!upcomingTrack) {
+          // must be crossfading
           return;
         }
         upcomingTrack.audio.pause();
         upcomingTrack.audio.currentTime = 0;
         if (currentTrack) {
-          seek(currentTrack.audio.currentTime - (ms || settings.positionStep));
+          seek((currentTrack.audio.currentTime * 1000) - (ms || settings.positionStep));
         }
       }
 
-      if (!currentTrack) {
-        return
+      function currentTrackBack() {
+        if (!currentTrack) {
+          return
+        }
+
+        if (upcomingTrack && !upcomingTrack.audio.paused) {
+          fadeOut(upcomingTrackBack, upcomingTrack.audio, 0, settings.muteTime);
+          return;
+        }
+
+        seek((currentTrack.audio.currentTime * 1000) - (ms || settings.positionStep));
       }
 
-      if (upcomingTrack && !upcomingTrack.audio.paused) {
-        fadeOut(upcomingTrackBack, upcomingTrack.audio, 0, settings.muteTime);
-        return;
-      }
-
-      seek(currentTrack.audio.currentTime - (ms || settings.positionStep));
+      currentTrackBack();
     }
 
     //
