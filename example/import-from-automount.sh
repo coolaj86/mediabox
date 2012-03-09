@@ -1,9 +1,16 @@
 #!/bin/bash
 set -e
+HOST='http://getmediabox.com'
+CURL='curl -s'
 
-curl http://mediabox.coolaj86.info:1232/api/mounts | json-prettify
+${CURL} ${HOST}/api/mounts | json-prettify
 
-curl http://mediabox.coolaj86.info:1232/api/import \
+${CURL} ${HOST}/api/import \
   -X POST \
   -H 'Content-Type: application/json' \
   -d '{ "path": "usbdrive" }' \
+
+${CURL} ${HOST}/api/import \
+  -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{ "path": "deletable", "remove": true }' \
