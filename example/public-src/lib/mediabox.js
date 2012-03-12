@@ -16,6 +16,7 @@
     , historyStore = require('json-storage')(localStorage, 'h')
     , PlayQueue = require('./play-queue').PlayQueue
     , playQueue
+    , playQueueSel = '.mb-playlist'
     ;
 
   function basename(path, ext) {
@@ -359,6 +360,19 @@
       tags.sort(randomize);
       PlayQueue.init(tags, createDomForTag);
       playQueue = new PlayQueue();
+      playQueue.on('update', function () {
+        // TODO only update current list
+        // TODO this._list
+        $(playQueueSel).find('.has-md5sum').remove();
+        this._list.forEach(function (item, i) {
+          if (!item.el) {
+            // adds el, audio, and md5sum
+            createDomForTag(item);
+          }
+          console.log(item);
+          $(playQueueSel).append(item.el);
+        });
+      });
     });
   }
 
