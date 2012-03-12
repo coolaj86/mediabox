@@ -15,8 +15,14 @@
   }
 
   function startServer(err) {
-    console.info('Starting server...');
-    server.listen(port, started);
+    console.info('Starting MediaBox server...');
+
+    if (require.main === module) {
+      server.listen(port, function () {
+        console.log('on port', server.address().port);
+      });
+    }
+    //server.listen(port, started);
     // TODO import old db log
   }
 
@@ -32,4 +38,6 @@
 
   console.info('Initing mediabox (folders, databases, etc)');
   mediabox.init(startServer);
+
+  module.exports = server;
 }());
