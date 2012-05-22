@@ -1,6 +1,6 @@
 {
   "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info/)",
-  "name": "mediabox-browser-client",
+  "name": "mediabox-webclient",
   "description": "A Browser-based Client to MediaBox",
   "version": "0.0.1",
   "homepage": "http://github.com/coolaj86/mediabox",

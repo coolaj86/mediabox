@@ -16,8 +16,7 @@
       "node": ">= 0.4"
   }
   , "dependencies": {
-      "MediaBox": "0.1.x"
-    , "connect-gzip": "0.1.5"
+      "connect-gzip": "0.1.5"
     , "steve": "0.5.x"
   }
   , "devDependencies": {}

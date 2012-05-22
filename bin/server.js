@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var MediaBox = require('../lib')
+  var MediaBox = require('../server')
     , config = require('./config')
     , connect = require('steve')
     , connectGzip = require('connect-gzip')
@@ -23,9 +23,9 @@
   mediabox = MediaBox.create(config);
 
   server = connect.createServer(
-      connect.favicon(__dirname + '/public/favicon.ico')
+      connect.favicon(__dirname + '/../webclient-deployed/favicon.ico')
     , connectGzip.gzip()
-    , connect.static(__dirname + '/public')
+    , connect.static(__dirname + '/../webclient-deployed')
   );
 
   server.use('/api', mediabox);
