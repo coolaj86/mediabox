@@ -7,3 +7,4 @@ testroot
 *.css
 *~
 public/
+npm-debug.log
