@@ -8,3 +8,4 @@ testroot
 *~
 public/
 npm-debug.log
+*.sqlite3

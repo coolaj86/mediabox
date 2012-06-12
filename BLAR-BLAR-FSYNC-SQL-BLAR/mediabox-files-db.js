@@ -35,7 +35,7 @@
     });
   };
 
-  Db.prototype.createTable = function (err) {
+  Db.prototype.createTable = function () {
     var self = this
       ;
 
@@ -61,8 +61,8 @@
 
   module.exports = Db;
   
-  function run() {
-    var db = Db.create('./', 'audio')
+  function run(fileMetaDir, outputSqlite) {
+    var db = Db.create('./', outputSqlite.replace(/\.sqlite.*/g, ''))
       , walk
       , values = []
       , count = 0
@@ -70,9 +70,8 @@
 
     db.init(function () {
       console.log('db initialized');
-    });
 
-    walk = Walk.walk(process.argv[2]);
+    walk = Walk.walk(fileMetaDir);
     walk.on('file', function (root, stat, next) {
       var rs
         , hash = crypto.createHash('sha1')
@@ -93,7 +92,7 @@
           ;
 
         /*
-          { uuid: true,
+            uuid: true,
             md5sum: true,
             path: true,
             name: true,
@@ -138,10 +137,11 @@
           next();
         }
 
-        });
+      });
     });
 
     walk.on('end', flushSql);
+    });
 
     function flushSql(cb) {
       var sql = sqlitize.insert_many(directive.tables[0], values, { resolve: 'ignore' })
@@ -161,7 +161,7 @@
   }
 
   if (require.main === module) {
-    run();
+    run(process.argv[2], process.argv[3] || 'meta');
   }
   /*
     //stathash: true,
