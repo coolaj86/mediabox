@@ -1,0 +1,3 @@
+Please discretely report vulnerabilities to johndoe@example.com and feel free to sign the guestbook (if you've obtained write access).
+
+/* GUESTBOOK */

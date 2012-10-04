@@ -1,0 +1,14 @@
+/* TEAM */
+  Head Honcho: John Doe
+  Site: http://johndoe.name
+  Twitter: @johndoe
+  Location: Silicon Slopes, UT
+
+/* THANKS */
+  Jane Doe: http://janedoe.name
+
+/* SITE */
+  Last update: YYYY/MM/DD 
+  Standards: HTML5, CSS3,..
+  Components: Modernizr, jQuery, etc.
+  Software: Software used for the development

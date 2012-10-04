@@ -1,0 +1,4 @@
+# Allow all robots
+
+User-agent: *
+Disallow:

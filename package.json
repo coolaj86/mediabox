@@ -1,0 +1,46 @@
+{
+  "author": "FOO-AUTHOR <FOO-A-EMAIL> (FOO-A-WEB)",
+  "name": "FOO-APP",
+  "description": "FOO-APP-DESC",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/FOO-G-ORG/FOO-G-REPO.git"
+  },
+  "bin": {
+    "FOO-APP-server": "bin/server.js"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "prepublish": "node deploy"
+  },
+  "dependencies": {
+    "connect": "2.x",
+    "http-json": "1.x",
+    "connect_router": "1.x",
+    "connect-cookieless-session": "0.6.x",
+    "nowww": "1.x",
+    "connect-pathname": "1.x",
+    "connect-xcors": "0.5.x",
+    "express-chromeframe": "0.2.x",
+    "underscore": ">=1.3.3 <1.4.0",
+    "forEachAsync": ">=2.2.0 <2.3.0",
+    "optimist": ">=0.3.4 <0.4.0",
+    "read": ">=0.1.0 <0.2.0",
+    "sequence": ">=2.2.1 <2.3.0",
+    "npm": "1.x",
+    "wrench": "1.x",
+    "jade": "0.26.x",
+    "less": "1.x",
+    "pakman": "0.8.x",
+    "uglify-js": "1.x"
+  },
+  "main": "server/server",
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}

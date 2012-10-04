@@ -1,0 +1,32 @@
+!!! 5
+html
+  head
+    title MediaBox Viewer
+    meta(http-equiv="X-UA-Compatible", content="IE=Edge,chrome=1")
+    //if IE
+      script
+        alert(
+            'Your version of Internet Explorer is out-of-date and or buggy.'
+          + ' Please use Chrome or Firefox to run this application.'
+        );
+    meta(http-equiv="Content-Type", content="text/html; charset=UTF-8")
+    meta(charset="utf-8")
+    link(rel="stylesheet", href="style.css", type="text/css", media="screen")
+    link(rel="stylesheet", href="style.css", type="text/css", media="print")
+    script(src="pakmanaged.js")
+  body
+    #css-body-wrapper
+      h1.
+        Search all the things
+      form#js-search
+        span.
+          Search:
+        input#js-search-input(type='text')
+      #js-results-container
+        ul#js-results.css-results
+          li#js-result-item
+            .js-name File Name.ext
+            .js-path /path/to/thing
+            .js-size 1 KiB
+            .js-modified-human 2012 Sep 7, 8:46pm
+            .js-modified 2012-09-07 02:05:46.573
