@@ -10,7 +10,8 @@
     , _ = require('underscore')
     , forEachAsync = require('forEachAsync')
     , app = connect.createServer()
-    , doQuery = require('./json-stub').query
+    //, doQuery = require('./json-stub').query
+    , doQuery = require('./fts-query').query
     ;
 
   function getMeta(req, res) {

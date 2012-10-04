@@ -35,7 +35,8 @@
     "jade": "0.26.x",
     "less": "1.x",
     "pakman": "0.8.x",
-    "uglify-js": "1.x"
+    "uglify-js": "1.x",
+    "sqlite3": ">=2.1.5 <2.2.0"
   },
   "main": "server/server",
   "devDependencies": {},

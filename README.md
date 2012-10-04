@@ -5,6 +5,10 @@ MediaBox-viewer
   node deploy
   ./bin/server.js 4200
 
+Place the rank extension in `./lib/fts4-rank.darwin.sqlext` or `fts4-rank.linux.sqlext`
+
+Place a daatbase in `./var/meta-fts.sqlite3`
+
 DUMMY
 ===
 
