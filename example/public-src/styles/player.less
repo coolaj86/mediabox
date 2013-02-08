@@ -9,6 +9,40 @@
   }
 }
 
+.less-no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.css-mb-music-style {
+  .less-no-select;
+  float: right;
+  width: 150px;
+  font-size: 10pt;
+  background-color: grey;
+  * {
+    background-color: grey;
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid;
+  }
+  *:hover {
+    border: 1px solid red;
+    background-color: black;
+    color: white;
+  }
+  .css-selected {
+    border: 1px solid green;
+    background-color: white;
+    color: black;
+  }
+}
+
 .css-mb-leftbox {
   float: left;
 }

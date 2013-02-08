@@ -1,14 +1,18 @@
+/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true*/
 (function () {
   "use strict";
 
   var MediaBox = require('../lib')
     , config = require('./config')
     , connect = require('steve')
-    , connectGzip = require('connect-gzip')
     , mediabox
     , server
     , port = process.argv[2] || config.port || 1232
     ;
+
+  if (!connect.router) {
+    connect.router = require('connect_router');
+  }
 
   function started() {
     console.info('listening on port ' + port);
@@ -24,7 +28,7 @@
 
   server = connect.createServer(
       connect.favicon(__dirname + '/public/favicon.ico')
-    , connectGzip.gzip()
+    , connect.compress({ level: 9, memLevel: 9 })
     , connect.static(__dirname + '/public')
   );
 

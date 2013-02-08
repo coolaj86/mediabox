@@ -1,12 +1,22 @@
+/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true*/
 (function () {
   "use strict";
 
   function getLocation() {
+    /*
     return {
         "protocol": "http:"
       , "hostname": "getmediabox.com"
       , "host": "getmediabox.com"
       , "port": ""
+      , "pathname": "/api"
+    };
+    */
+    return {
+        "protocol": "http:"
+      , "hostname": "localhost"
+      , "host": "localhost:1232"
+      , "port": 1232
       , "pathname": "/api"
     };
   }
