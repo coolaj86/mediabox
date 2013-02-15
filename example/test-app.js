@@ -1,8 +1,13 @@
+/*jshint strict:true node:true es5:true
+onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true*/
 (function () {
-  var config = require('./config')
+  "use strict";
+
+  var path = require('path')
+    , config = require('./config')
     , MediaBox = require('../lib')
     , mediabox
-    , scanpath = process.argv[2]
+    , scanpath = path.resolve(process.cwd(), process.argv[2])
     ;
 
   function importPath(err) {
@@ -14,6 +19,11 @@
         console.error(err.stack);
       }
       console.log('done');
+      console.log('syncing (and deleting)...');
+      // 
+      setTimeout(function () {
+        process.exit();
+      }, 11 * 1000);
     }, scanpath);
     //mediabox.importOne();
     //*/

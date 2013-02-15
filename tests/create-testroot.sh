@@ -1,16 +1,18 @@
 #!/bin/bash
 
 echo "Popullating './testroot' with files of various timestamps"
-echo "This will take 7 seconds or so (TODO: use 'touch' instead of 'sleep')"
 rm -rf ./testroot
 mkdir -p ./testroot/absolute
 mkdir -p ./testroot/symbolic
+mkdir -p ./test-files/
 
-if [ ! -f "./test-files/sample.m4a" ]
+if [ ! -f "./test-files/sample.mp3" ]
 then
-  curl -L 'http://www.kolonelschnapps.co.uk/sample-music/02Track02sample.m4a?attredirects=0&d=1' \
-    -o ./test-files/sample.m4a
+  # http://www.last.fm/music/+free-music-downloads
+  curl -L 'http://freedownloads.last.fm/download/499948173/Broken%2BHearts.mp3' \
+    -o ./test-files/sample.mp3
 fi
+echo "This will take 7 seconds or so (TODO: use 'touch' instead of 'sleep')"
 rsync -a ./test-files/ ./testroot/absolute/
 #rsync -a ./test-files/button-10.mp3 ./testroot/absolute/button-10.mp3
 echo 'hello world' > ./testroot/absolute/real
