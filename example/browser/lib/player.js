@@ -1,15 +1,18 @@
+/*jshint strict:true node:true es5:true browser:true
+indent:2 onevar:true laxcomma:true laxbreak:true
+eqeqeq:true immed:true latedef:true*/
 (function () {
   "use strict";
 
   var $ = require('ender')
     ;
 
-  function pad(s) {
-    s = s.toString();
-    while (s.length < 2) {
-      s = "0" + s;
+  function pad(str) {
+    str = str.toString();
+    while (str.length < 2) {
+      str = "0" + str;
     }
-    return s;
+    return str;
   }
 
   function toTime(floatSecs) {
@@ -34,45 +37,45 @@
     selector += ' ';
 
     var playerEl = $(selector)
-      , selectors = {
-            "play": '.mb-play'
-          , "pause": '.mb-pause'
-          , "louder": '.mb-vol-up'
-          , "quieter": '.mb-vol-down' 
-          , "mute": '.mb-vol-mute'
-          , "next": '.mb-next'
-          , "previous": '.mb-previous'
-          , "forward": '.mb-pos-forward'
-          , "back": '.mb-pos-back'
-          , "tracklist": selector + '.mb-audios'
-          , "playtimeTotal": selector + '.mb-playtime-total'
-          , "playtimeRemaining": selector + '.mb-playtime-remaining'
-          , "playtime": selector + '.mb-playtime'
-          , "progress": selector + '.mb-progress'
-          , "buffer": selector + '.mb-buffer'
-          , "volume": selector + '.mb-volume'
-          , "rawvolume": selector + '.mb-volume-raw'
-          , "duration": selector + '.duration'
-          , "title": selector + '.mb-title'
-          , "artist": selector + '.mb-artist'
-          , "album": selector + '.mb-album'
-          , "buffering": selector + '.mb-buffering'
-          , "thumbsUp": selector + '.mb-thumbs-up'
-          , "thumbsDown": selector + '.mb-thumbs-down'
-          , "ratingImg": selector + '.mb-rating-img'
-          , "tagAsSpecialtyMusic": selector + '.mb-specialty-music'
-          , "tagAsNotMusic": selector + '.mb-not-music'
+      , selectors =
+        { "play": '.mb-play'
+        , "pause": '.mb-pause'
+        , "louder": '.mb-vol-up'
+        , "quieter": '.mb-vol-down' 
+        , "mute": '.mb-vol-mute'
+        , "next": '.mb-next'
+        , "previous": '.mb-previous'
+        , "forward": '.mb-pos-forward'
+        , "back": '.mb-pos-back'
+        , "tracklist": selector + '.mb-audios'
+        , "playtimeTotal": selector + '.mb-playtime-total'
+        , "playtimeRemaining": selector + '.mb-playtime-remaining'
+        , "playtime": selector + '.mb-playtime'
+        , "progress": selector + '.mb-progress'
+        , "buffer": selector + '.mb-buffer'
+        , "volume": selector + '.mb-volume'
+        , "rawvolume": selector + '.mb-volume-raw'
+        , "duration": selector + '.duration'
+        , "title": selector + '.mb-title'
+        , "artist": selector + '.mb-artist'
+        , "album": selector + '.mb-album'
+        , "buffering": selector + '.mb-buffering'
+        , "thumbsUp": selector + '.mb-thumbs-up'
+        , "thumbsDown": selector + '.mb-thumbs-down'
+        , "ratingImg": selector + '.mb-rating-img'
+        , "tagAsSpecialtyMusic": selector + '.mb-specialty-music'
+        , "tagAsNotMusic": selector + '.mb-not-music'
         }
-      , ratingImgs = {
-            "NaN": "images/rating+0.png"
-          , "-1": "images/rating-1.png"
-          , "-2": "images/rating-2.png"
-          , "0": "images/rating+0.png"
-          , "1": "images/rating+1.png"
-          , "2": "images/rating+2.png"
+      , ratingImgs = 
+        { "NaN": "images/rating+0.png"
+        , "-1": "images/rating-1.png"
+        , "-2": "images/rating-2.png"
+        , "-0": "images/rating+0.png" // just in case
+        , "0": "images/rating+0.png"
+        , "1": "images/rating+1.png"
+        , "2": "images/rating+2.png"
         }
       , defaultVolume = 1
-      // these two are given separate names for semantic integrity
       , positionStep = 5 * 1000
       , fadeTimeout
       ;
@@ -138,6 +141,8 @@
       // seek
       function seek() {
         var position = $(selectors.progress).val()
+          ;
+
         strategy.seek(position);
       }
       $(selector).delegate(selectors.progress, 'change', seek);
@@ -161,7 +166,7 @@
       // previousTrack
       $(selector).delegate(selectors.previous, 'click', function () {
         // strategy.skipTo
-        alert("Hey! :-)   Thanks for trying out the 'previous' button.... but it doesn't work yet.");
+        window.alert("Hey! :-)   Thanks for trying out the 'previous' button.... but it doesn't work yet.");
       });
 
       $(selector).delegate(selectors.thumbsUp, 'click', strategy.thumbsUp);

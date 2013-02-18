@@ -115,5 +115,7 @@ indent:2 eqeqeq:true immed:true latedef:true*/
     $('body').bind('drop', abstracter);
   }
 
+  MediaBox.init();
+
   $.domReady(attachHandlers);
 }());
