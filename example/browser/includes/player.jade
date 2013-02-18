@@ -1,7 +1,7 @@
 .mb-player
   .css-mb-leftbox
     span.mb-audios
-    button.mb-play |>
+    button.mb-play |&gt;
     button.mb-pause ||
     span.css-audio-progress
       progress.css-progress-buffer.mb-buffer(max="1", value="0")
@@ -22,10 +22,10 @@
     span.css-playtimes.mb-playtime-remaining
       | 0:00
     br
-    button.mb-previous <<
-    button.mb-pos-back <
-    button.mb-pos-forward >
-    button.mb-next >>
+    button.mb-previous &lt;&lt;
+    button.mb-pos-back &lt;
+    button.mb-pos-forward &gt;
+    button.mb-next &gt;&gt;
     //- for things such as audio books and podcasts
     button.mb-not-music(title="Audio Book, Podcast, Goat Noises, etc")
       | Not Music

@@ -1,3 +1,6 @@
+/*jshint strict:true node:true es5:true browser:true
+onevar:true laxcomma:true laxbreak:true
+indent:2 eqeqeq:true immed:true latedef:true*/
 (function () {
   "use strict";
 
@@ -59,7 +62,7 @@
 
     // TODO document if files.length is always present or no
     if (!files || !files.length) {
-      alert('No files specified');
+      window.alert('No files specified');
       return;
     }   
    
@@ -67,11 +70,11 @@
       file = files[i];
       id = randomString();
       metas[id] = {
-          "name": file.fileName || file.name || undefined
-        , "size": file.fileSize || file.size || undefined
-        , "lastModifiedDate": file.lastModifiedDate || undefined
-        , "type": file.type || undefined
-        , "path": file.webkitRelativePath || file.relativePath || file.path || undefined
+        "name": file.fileName || file.name || undefined
+      , "size": file.fileSize || file.size || undefined
+      , "lastModifiedDate": file.lastModifiedDate || undefined
+      , "type": file.type || undefined
+      , "path": file.webkitRelativePath || file.relativePath || file.path || undefined
       };
       filesMap[id] = file;
     }
