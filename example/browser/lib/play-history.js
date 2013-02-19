@@ -1,3 +1,6 @@
+/*jshint strict:true node:true es5:true
+indent:2 onevar:true laxcomma:true laxbreak:true
+eqeqeq:true immed:true latedef:true undef:true unused:true */
 (function () {
   "use strict";
 
@@ -5,7 +8,7 @@
     , sessionStorage = require('sessionStorage')
     , JsonStorage = require('json-storage')
     , playHistoryStore = JsonStorage.create(localStorage, 'ph')
-    , playHistorySession = JsonStorage(sessionStorage, 'phs')
+    , playHistorySession = JsonStorage.create(sessionStorage, 'phs')
     , maxLength = 200
     , minLength = 100
     ;

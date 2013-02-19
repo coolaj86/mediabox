@@ -1,10 +1,13 @@
+/*jshint strict:true node:true es5:true
+indent:2 onevar:true laxcomma:true laxbreak:true
+eqeqeq:true immed:true latedef:true*/
 // This is an abstraction over the Audio object which allows for fading, including crossfading
 // The following events cancel a crossfade
 //    * mute
 //    * pause
 //    * stop
 //    * forward
-//    * skip // skips the new song?
+//    * skip // should this skip the new song or the old one? probably the new one
 // This means that the following events always operate on the current track
 //    * unmute
 //    * play
@@ -18,6 +21,8 @@
     , fadeVolume = require('./volume-fader')
     , allMediaEvents
     , debugHandlers
+    , VOL_MAX = 1000 // volume max
+    , SEC = 1000 // milliseconds
     ;
 
   allMediaEvents = [
@@ -46,10 +51,10 @@
     , 'timeupdate'
     , 'volumechange'
     , 'waiting'
-  ];
+    ];
 
-  debugHandlers = {
-      "abort": function () {
+  debugHandlers = 
+    { "abort": function () {
         console.log('abort');
       }
     , "canplay": function () {
@@ -124,14 +129,14 @@
     , "waiting": function () {
         console.log('waiting');
       }
-  };
+    };
 
   // 1000 ticks of volume are more than enough and prevent weirdness
   function toIntegerVolume(n) {
-    return Number((n * 1000).toFixed(0));
+    return Number((n * VOL_MAX).toFixed(0));
   }
   function toFloatVolume(n) {
-    return Number((n / 1000).toFixed(3));
+    return Number((n / VOL_MAX).toFixed(3));
   }
   function preserveFloatVolume(n) {
     return Number(n.toFixed(3));
@@ -180,8 +185,8 @@
       , playNextImmediately
       ;
 
-    settings = {
-        volume: params.volume || 800 // 0.8
+    settings = 
+      { volume: params.volume || 800 // 0.8
       , volumeStep: params.volumeStep || 50 // 0.05
       , pauseTime: params.pauseTime || 250
       , resumeTime: params.resumeTime || 250
@@ -189,9 +194,9 @@
       , muteTime: params.muteTime || 150
       , muted: params.muted || false
       , unmuteTime: params.unmuteTime || 250
-      , crossfadeTime: params.crossfadeTime || 5 * 1000 // this is in seconds... duh
-      , positionStep: params.positionStep || 5 * 1000
-    };
+      , crossfadeTime: params.crossfadeTime || (5 * SEC) // this is in seconds... duh
+      , positionStep: params.positionStep || (5 * SEC)
+      };
 
     function thumbsUp() {
       rating((sanatizeRating(currentTrack.rating) || 0) + 1);
@@ -223,11 +228,15 @@
         $(track.audio).remove();
         delete track.audio;
         console.log('really really deleted');
-        cb && cb();
+        if (cb) {
+          cb();
+        }
       }
 
       if (!track) {
-        cb && cb();
+        if (cb) {
+          cb();
+        }
         return;
       }
       console.log('[l] destroy');
@@ -255,10 +264,10 @@
       emitter.emit('infoupdate', currentTrack);
       emitter.emit('volumechange', settings.volume);
       if (currentTrack.audio.duration) {
-        currentTrack.events['durationchange']();
+        currentTrack.events.durationchange();
       }
       if (currentTrack.audio.buffered.length) {
-        currentTrack.events['progress']();
+        currentTrack.events.progress();
       }
       emitter.emit('next', enque);
     }
@@ -341,7 +350,7 @@
       // otherwise, as soon as it loads play it
       if (upcomingTrack) {
         console.log('next is calling resume');
-        resume()
+        resume();
       } else {
         playNextImmediately = true;
       }
@@ -376,7 +385,7 @@
         error();
       }
 
-      track.events['error'] = error;
+      track.events.error = error;
       track.audio.addEventListener('error', error);
     }
 
@@ -411,7 +420,7 @@
       // I can't remember what they are... but I was just thinking about it
       // anyway duration - time will be correct
       // ... a seek into the crossfade zone isone of them
-      crossfadeTime = (audio.duration - audio.currentTime) * 1000;
+      crossfadeTime = (audio.duration - audio.currentTime) * SEC;
       console.log('crossfadeTime');
       console.log(audio.duration, audio.currentTime);
       fadeVolume(null, audio, 0, crossfadeTime);
@@ -422,8 +431,8 @@
       fadeVolume(emitChangeEvents, upcomingTrack.audio, toFloatVolume(settings.volume), crossfadeTime);
 
       // TODO fire ended event
-      audio.removeEventListener('error', events['error']);
-      audio.removeEventListener('end', events['end']);
+      audio.removeEventListener('error', events.error);
+      audio.removeEventListener('end', events.end);
 
       // removes the queue events
       removeEvents(upcomingTrack);
@@ -436,7 +445,7 @@
         , audio = track.audio
         ;
         
-      events['progress'] = function () {
+      events.progress = function () {
         var self = track.audio
           ;
 
@@ -449,27 +458,27 @@
         }
       };
 
-      events['suspend'] = function () {
+      events.suspend = function () {
         emitter.emit('suspend', this, null);
       };
 
-      events['volumechange'] = function () {
+      events.volumechange = function () {
         // don't allow wonky volumes, keep it in the 1000 range
         emitter.emit('rawvolumechange', toIntegerVolume(this.volume));
       };
 
-      events['durationchange'] = function () {
+      events.durationchange = function () {
         var self = track.audio
           ;
 
         track.duration = currentTrack.duration = self.duration;
-        emitter.emit('durationchange', self, null, track.duration * 1000);
+        emitter.emit('durationchange', self, null, track.duration * SEC);
       };
 
-      events['timeupdate'] = function () {
-        if ((this.duration - this.currentTime <= (settings.crossfadeTime / 1000)) && !currentTrack.fadeout) {
+      events.timeupdate = function () {
+        if ((this.duration - this.currentTime <= (settings.crossfadeTime / SEC)) && !currentTrack.fadeout) {
           currentTrack.fadeout = true;
-          console.log('timeupdate')
+          console.log('timeupdate');
           startCrossfade();
           // TODO start fading
         }
@@ -642,7 +651,7 @@
       } else if (diff > 0) { // (newVol > oldVol)
         limiter = 'min';
         limit = 1;
-        intLimit = 1000;
+        intLimit = VOL_MAX;
       } else { // (diff < 0) (newVol < oldVol)
         limiter = 'max';
         limit = 0;
@@ -680,7 +689,11 @@
     }
 
     function seek(time) {
-      time = (time / 1000);
+      var hasTimeLeft
+        , hasStarted
+        ;
+
+      time = (time / SEC);
       if (upcomingTrack && !upcomingTrack.audio.paused) {
         promote();
       }
@@ -689,11 +702,15 @@
         return;
       }
 
-      if (!(time < currentTrack.audio.duration)) {
-        // so that the end event eventually fires
+      // Note: this also handles the NaN case
+      hasTimeLeft = time < currentTrack.audio.duration;
+      if (!hasTimeLeft) {
+        // so that the end event actually fires
         currentTrack.audio.currentTime = currentTrack.audio.duration - 0.1;
       }
-      if (!(time > 0)) {
+
+      hasStarted = time > 0;
+      if (!hasStarted) {
         currentTrack.audio.currentTime = 0;
         return;
       }
@@ -705,7 +722,7 @@
       if (upcomingTrack && !upcomingTrack.audio.paused) {
         promote();
       }
-      seek((currentTrack.audio.currentTime * 1000) + (ms || settings.positionStep));
+      seek((currentTrack.audio.currentTime * SEC) + (ms || settings.positionStep));
     }
 
     // back
@@ -718,21 +735,21 @@
         upcomingTrack.audio.pause();
         upcomingTrack.audio.currentTime = 0;
         if (currentTrack) {
-          seek((currentTrack.audio.currentTime * 1000) - (ms || settings.positionStep));
+          seek((currentTrack.audio.currentTime * SEC) - (ms || settings.positionStep));
         }
       }
 
       function currentTrackBack() {
         if (!currentTrack) {
-          return
-        }
-
-        if (upcomingTrack && !upcomingTrack.audio.paused) {
-          fadeOut(upcomingTrackBack, upcomingTrack.audio, 0, settings.muteTime);
           return;
         }
 
-        seek((currentTrack.audio.currentTime * 1000) - (ms || settings.positionStep));
+        if (upcomingTrack && !upcomingTrack.audio.paused) {
+          fadeVolume(upcomingTrackBack, upcomingTrack.audio, 0, settings.muteTime);
+          return;
+        }
+
+        seek((currentTrack.audio.currentTime * SEC) - (ms || settings.positionStep));
       }
 
       currentTrackBack();

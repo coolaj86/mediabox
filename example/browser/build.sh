@@ -2,7 +2,7 @@ mkdir -p ../public
 
 echo "Compiling CommonJS -> BrowserJS"
 pakmanager build >/dev/null 2>/dev/null
-rm pakmanaged.html
+rm -f pakmanaged.html
 
 echo "Compressing BrowserJS -> MinifiedJS"
 #uglifyjs pakmanaged.js > ../public/pakmanaged.min.js
