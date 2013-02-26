@@ -4,7 +4,7 @@
 
   var MediaBox = require('../lib')
     , config = require('./config')
-    , connect = require('steve')
+    , connect = require('connect')
     , mediabox
     , server
     , port = process.argv[2] || config.port || 1232
@@ -18,7 +18,7 @@
     console.info('listening on port ' + port);
   }
 
-  function startServer(err) {
+  function startServer() {
     console.info('Starting server...');
     server.listen(port, started);
     // TODO import old db log
