@@ -1,42 +1,43 @@
 {
-    "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info/)"
-  , "name": "MediaBox-server"
-  , "description": "Example Server for MediaBox"
-  , "version": "0.1.0"
-  , "homepage": "http://getmediabox.com"
-  , "repository": {
-      "type": "git"
-    , "url": "git://github.com/coolaj86/mediabox.git"
-  }
-  , "main": "lib/index"
-  , "scripts": {
-      "test": "node server"
-  }
-  , "engines": {
-      "node": ">= 0.4"
-  }
-  , "dependencies": {
-      "MediaBox": "0.1.x",
-      "connect-gzip": "0.1.5",
-      "connect": "2.x",
-      "connect_router": "1.x",
-      "connect-cookieless-session": "0.6.x",
-      "connect-pathname": "1.x",
-      "connect-xcors": "0.5.x",
-      "http-json": "1.x",
-      "nowww": "1.x",
-      "express-chromeframe": "0.2.x",
-      "underscore": ">=1.3.3 <1.4.0",
-      "forEachAsync": ">=2.2.0 <2.3.0",
-      "optimist": ">=0.3.4 <0.4.0",
-      "read": ">=0.1.0 <0.2.0",
-      "sequence": ">=2.2.1 <2.3.0",
-      "npm": "1.x",
-      "wrench": "1.x",
-      "jade": "0.26.x",
-      "less": "1.x",
-      "pakman": "0.8.x",
-      "uglify-js": "1.x"
-  }
-  , "devDependencies": {}
+  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info/)",
+  "name": "MediaBox-server",
+  "description": "Example Server for MediaBox",
+  "version": "0.1.0",
+  "homepage": "http://getmediabox.com",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/coolaj86/mediabox.git"
+  },
+  "main": "lib/index",
+  "scripts": {
+    "test": "node server"
+  },
+  "engines": {
+    "node": ">= 0.4"
+  },
+  "dependencies": {
+    "MediaBox": "0.1.x",
+    "connect-gzip": "0.1.5",
+    "connect": "2.x",
+    "connect_router": "1.x",
+    "connect-cookieless-session": "0.6.x",
+    "connect-pathname": "1.x",
+    "connect-xcors": "0.5.x",
+    "http-json": "1.x",
+    "nowww": "1.x",
+    "express-chromeframe": "0.2.x",
+    "underscore": ">=1.3.3 <1.4.0",
+    "forEachAsync": ">=2.2.0 <2.3.0",
+    "optimist": ">=0.3.4 <0.4.0",
+    "read": ">=0.1.0 <0.2.0",
+    "sequence": ">=2.2.1 <2.3.0",
+    "npm": "1.x",
+    "wrench": "1.x",
+    "jade": "0.26.x",
+    "less": "1.x",
+    "pakman": "0.8.x",
+    "uglify-js": "1.x",
+    "formaline": "~2.0.1"
+  },
+  "devDependencies": {}
 }
