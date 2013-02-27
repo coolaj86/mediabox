@@ -250,6 +250,7 @@ eqeqeq:true immed:true latedef:true*/
 
     tag.fileMd5sum = md5sum;
     tag.href = resource;
+    // BUG only a limited number of audio tags (across all pages) can be buffering / playing
     tag.audio = $('<audio src="' + resource + '" preload="metadata"></audio>')[0];
     // TODO use PURE template
     tag.el = $(

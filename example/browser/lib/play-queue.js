@@ -6,7 +6,7 @@
     , sessionStorage = require('sessionStorage')
     , JsonStorage = require('json-storage')
     , playQueueStore = JsonStorage.create(localStorage, 'pl')
-    , playQueueSession = JsonStorage(sessionStorage, 'pls')
+    , playQueueSession = JsonStorage.create(sessionStorage, 'pls')
       // TODO decouple
     , createDomForTag
     , store = require('json-storage')(localStorage)
@@ -50,7 +50,7 @@
         // TODO reassoc elements and audio
         self._list[i] = PlaylistItem.create(curList[i]);
         //if (self.list[i]) {
-          createDomForTag(self._list[i]);
+        createDomForTag(self._list[i]);
         //} 
       }
 
@@ -98,10 +98,12 @@
       return;
     }
 
+    /*
     this._list.forEach(function (item) {
       item.audio.preload = 'metadata';
     });
     this._list[0].audio.preload = 'auto';
+    */
   };
   PlayQueue.prototype.refresh = function () {
     var self = this
@@ -115,13 +117,15 @@
   PlayQueue.prototype.add = function (tag) {
     // TODO check if is already in playlist
     tag = PlaylistItem.create(tag);
+    /*
     if (!tag.audio && (tag.href || tag.src)) {
       tag.audio = new Audio();
       tag.audio.src = tag.href || tag.src;
     }
+    */
     createDomForTag(tag);
     // adds el, audio, and md5sum
-    tag.audio.preload = 'metadata';
+    //tag.audio.preload = 'metadata';
     this._list.push(tag);
     this.save();
     this.refresh();
@@ -156,6 +160,10 @@
       , curLen = this._list.length
       ;
 
+    function assignExtents(key) {
+      tag[key] = tag.extent[key];
+    }
+
     this._queueMinLength = len;
 
     console.log('queueLength:', this._list.length);
@@ -171,9 +179,7 @@
       // just play unrated songs for now
       tag.extent = store.get(tag.fileMd5sum);
       if (tag.extent) {
-        Object.keys(tag.extent).forEach(function (key) {
-          tag[key] = tag.extent[key];
-        });
+        Object.keys(tag.extent).forEach(assignExtents);
         if ('rating' in tag.extent) {
           console.warn('took already-rated song out of random');
           continue;
@@ -241,6 +247,6 @@
   PlayQueue.init = function (_t, _c) {
     tags = _t;
     createDomForTag = _c;
-  }
+  };
   exports.PlayQueue = PlayQueue;
 }());

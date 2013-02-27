@@ -3,22 +3,26 @@
   "use strict";
 
   function getLocation() {
+    var loc
+      ;
+
     /*
-    return {
-        "protocol": "http:"
+    loc =
+      { "protocol": "http:"
       , "hostname": "getmediabox.com"
       , "host": "getmediabox.com"
       , "port": ""
       , "pathname": "/api"
-    };
+      };
     */
-    return {
-        "protocol": "http:"
+    loc =
+      { "protocol": "http:"
       , "hostname": "localhost"
-      , "host": "localhost:1232"
-      , "port": 1232
+      , "host": location.host || "localhost:8080"
+      , "port": location.port || 8080
       , "pathname": "/api"
-    };
+      };
+    return loc;
   }
 
   function getApiHref() {

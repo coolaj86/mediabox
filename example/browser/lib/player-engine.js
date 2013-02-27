@@ -55,79 +55,79 @@ eqeqeq:true immed:true latedef:true*/
 
   debugHandlers = 
     { "abort": function () {
-        console.log('abort');
+        console.log('PE abort');
       }
     , "canplay": function () {
-        console.log('canplay');
+        console.log('PE canplay');
       }
     , "canplaythrough": function () {
-        console.log('canplaythrough');
+        console.log('PE canplaythrough');
       }
     , "canshowcurrentframe": function () {
-        console.log('canshowcurrentframe');
+        console.log('PE canshowcurrentframe');
       }
     , "dataunavailable": function () {
-        console.log('dataunavailable');
+        console.log('PE dataunavailable');
       }
     , "durationchange": function () {
-        console.log('durationchange');
+        console.log('PE durationchange');
       }
     , "emptied": function () {
-        console.log('emptied');
+        console.log('PE emptied');
       }
     , "empty": function () {
-        console.log('empty');
+        console.log('PE empty');
       }
     , "ended": function () {
-        console.log('ended');
+        console.log('PE ended');
       }
     , "error": function () {
-        console.log('error');
+        console.log('PE error');
       }
     , "loadeddata": function () {
-        console.log('loadeddata');
+        console.log('PE loadeddata');
       }
     , "loadedmetadata": function () {
-        console.log('loadedmetadata');
+        console.log('PE loadedmetadata');
       }
     , "loadstart": function () {
-        console.log('loadstart');
+        console.log('PE loadstart');
       }
     , "mozaudioavailable": function () {
-        console.log('mozaudioavailable');
+        console.log('PE mozaudioavailable');
       }
     , "pause": function () {
-        console.log('pause');
+        console.log('PE pause');
       }
     , "play": function () {
-        console.log('play');
+        console.log('PE play');
       }
     , "playing": function () {
-        console.log('playing');
+        console.log('PE playing');
       }
     , "progress": function () {
-        console.log('progress');
+        console.log('PE progress');
       }
     , "ratechange": function () {
-        console.log('ratechange');
+        console.log('PE ratechange');
       }
     , "seeked": function () {
-        console.log('seeked');
+        console.log('PE seeked');
       }
     , "seeking": function () {
-        console.log('seeking');
+        console.log('PE seeking');
       }
     , "suspend": function () {
-        console.log('suspend');
+        console.log('PE suspend');
       }
     , "timeupdate": function () {
-        console.log('timeupdate');
+        console.log('PE timeupdate');
       }
     , "volumechange": function () {
-        console.log('volumechange', this.volume);
+        console.log('PE volumechange', this.volume);
       }
     , "waiting": function () {
-        console.log('waiting');
+        console.log('PE waiting');
       }
     };
 
@@ -138,9 +138,11 @@ eqeqeq:true immed:true latedef:true*/
   function toFloatVolume(n) {
     return Number((n / VOL_MAX).toFixed(3));
   }
+  /*
   function preserveFloatVolume(n) {
     return Number(n.toFixed(3));
   }
+  */
 
   function sanatizeRating(r) {
     return Math.min(Math.max(-2, parseInt(r, 10)), 2) || null;
@@ -223,8 +225,8 @@ eqeqeq:true immed:true latedef:true*/
         // saving this in case the user wants to play the file again
         track.href = track.audio.src;
         track.deleted = true;
-        track.audio.src = 'foo://cause-error (empties buffer)';
-        console.log('[delete the audio]');
+        //track.audio.src = 'foo://cause-error (empties buffer)';
+        console.log('[destroy]: remove AudioElement from DOM and delete property');
         $(track.audio).remove();
         delete track.audio;
         console.log('really really deleted');
@@ -244,7 +246,7 @@ eqeqeq:true immed:true latedef:true*/
       removeEvents(track);
 
       if (!track.audio.paused) {
-        console.log('[destroy] track before fade');
+        console.log('[destroy]: fade track, then remove');
         console.log(track.audio.paused, track.audio, track);
         // TODO use the pause() function ?
         fadeVolume(realDestroy, track.audio, 0, settings.pauseTime);
@@ -275,6 +277,7 @@ eqeqeq:true immed:true latedef:true*/
     function enque(track) {
       console.log('[n] enque');
       if (!track || (!track.audio && !track.href)) {
+        console.error('[enque]:', track);
         throw new Error('You gave nothing to enque (or missing audio or href)');
       }
       console.log('[n] enque', track.title);
@@ -356,12 +359,14 @@ eqeqeq:true immed:true latedef:true*/
       }
     }
 
+    /*
     function addDebugEvents(track) {
       console.log('[q] addDebug');
       allMediaEvents.forEach(function (key) {
         track.audio.addEventListener(key, debugHandlers[key]);
       });
     }
+    */
 
     function addQueueEvents(track) {
       console.log('[r] addQ');
@@ -442,7 +447,7 @@ eqeqeq:true immed:true latedef:true*/
     function addPlayEvents(track) {
       console.log('[t] addPlay');
       var events = track.events
-        , audio = track.audio
+        //, audio = track.audio
         ;
         
       events.progress = function () {
