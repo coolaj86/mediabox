@@ -26,11 +26,10 @@
 
   mediabox = MediaBox.create(config);
 
-  server = connect.createServer(
-      connect.favicon(__dirname + '/public/favicon.ico')
-    , connect.compress({ level: 9, memLevel: 9 })
-    , connect.static(__dirname + '/public')
-  );
+  server = connect.createServer();
+  server.use(connect.favicon(__dirname + '/public/favicon.ico'));
+  server.use(connect.compress({ level: 9, memLevel: 9 }));
+  server.use(connect.static(__dirname + '/public'));
 
   server.use('/api', mediabox);
 
