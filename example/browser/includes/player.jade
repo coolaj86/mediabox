@@ -1,8 +1,9 @@
 .mb-player
+  span.mb-audios
   .css-logo.css-lala-logo
-    span.css-logo-top
+    .css-logo-top
       | Media
-    span.css-logo-bottom
+    .css-logo-bottom
       | Box
 
   .css-lala-controls
@@ -45,67 +46,39 @@
     .mb-art.css-album-art
       img(src='images/unknown-album.png')
 
+    .css-playtimes
+      .css-buffering.mb-buffering
+        img(src='/images/loading.gif')
+      .mb-playtime.css-playtimes-playtime 0:00
+
     .css-track-info
       .css-track-meta
-        .mb-title
+        .css-track-title.mb-title
         .css-album-data
           |  by 
           span.mb-artist
           |  on 
           span.mb-album
       .css-track-progress.css-audio-progress
-        span.css-playtimes.mb-playtime
-          | 0:00
         .css-progress-container
-          span.css-buffering-spinny.mb-buffering
-            img(src='/images/loading.gif')
           progress.css-progress-buffer.mb-buffer(max="1", value="0")
           input.css-progress-audio.mb-progress(type="range", min="0", max="300", value="0")
-          span.css-playtimes.mb-playtime-total
-            | 0:00
-        span.css-playtimes.mb-playtime-remaining
-          | 0:00
-          
-    .css-track-rating
-      button.css-thumbs.mb-thumbs-down
-        img.css-mb-thumb-img(src='images/thumbs-down.png')
-      button.css-thumbs.mb-thumbs-up
-        img.css-mb-thumb-img(src='images/thumbs-up.png')
-      button.css-mb-rating-img
-        img.mb-rating-img(src='images/rating+0.png')
+          .css-playtimes.mb-playtime-total 0:00
 
+    .css-playtimes
+      .css-track-rating
+        button.css-thumbs.mb-thumbs-down
+          img.css-mb-thumb-img(src='images/thumbs-down.png')
+        button.css-thumbs.mb-thumbs-up
+          img.css-mb-thumb-img(src='images/thumbs-up.png')
+        button.css-mb-rating-img
+          img.mb-rating-img(src='images/rating+0.png')
+      .mb-playtime-remaining.css-playtimes-remaining
+        | 0:00
+          
   .css-lala-share
 
   .css-lala-search
-
-  span.mb-audios
-
-  //- for things such as audio books and podcasts
-  button.mb-not-music(title="Audio Book, Podcast, Goat Noises, etc")
-    | Not Music
-  //- for things such as chicken dance, christmas music, hymns, and such
-  button.mb-specialty-music(title="Chicken Dance, Christmas, Hymn, etc")
-    | Special
-.css-mb-music-style.mb-music-style Dance Style
-  .mb-audio(data-mb-music-style="notmusic") Non-music
-    .mb-ebook(data-mb-music-style="ebook") eBook
-    .mb-podcast(data-mb-music-style="podcast") Podcast
-  .mb-music(data-mb-music-style="music") Music
-    .mb-dance(data-mb-music-style="fast") Single / Group:
-      .mb-crap(data-mb-music-style="club") Club Dance
-      .mb-crap(data-mb-music-style="hiphop") Hip-Hop
-      .mb-break(data-mb-music-style="break") Breakdance
-      .mb-line(data-mb-music-style="line") Country Line
-      .mb-techno(data-mb-music-style="techno") Techno
-    .mb-slow(data-mb-music-style="slow") Couple:
-      .mb-waltz(data-mb-music-style="waltz") Waltz
-      .mb-foxtrot(data-mb-music-style="foxtrot") Foxtrot
-      .mb-swing(data-mb-music-style="swing") Classic Swing
-      .mb-country-swing(data-mb-music-style="countryswing") Country Swing
-      .mb-cha-cha(data-mb-music-style="chacha") Cha-cha
-    .mb-listening(data-mb-music-style="listening") No Dance:
-      .mb-crap(data-mb-music-style="crap") Rap
-      .mb-easy(data-mb-music-style="easy") Easy listening
-      .mb-cruising(data-mb-music-style="cruising") Crusin'
-      .mb-jazz(data-mb-music-style="dinner") Jazzy / Dinner
-      .mb-world(data-mb-music-style="world") World
+    form#search(action='#fixme')
+      input#search-library(x-webkit-speech='x-webkit-speech')
+      input#submit(type='submit', value='Search Library')

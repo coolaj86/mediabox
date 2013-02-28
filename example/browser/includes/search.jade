@@ -1,24 +1,20 @@
-form#search(action='#fixme')
-  input#search-library(x-webkit-speech='x-webkit-speech')
-  input#submit(type='submit', value='Search Library')
-  table#library
-    thead
-      tr
-        th
-          | Title
-          //-input#search-titles(type='text', x-webkit-speech='x-webkit-speech')
-        th
-          | Artist
-          //-input#search-artists(type='text', x-webkit-speech='x-webkit-speech')
-        th
-          | Album
-          //-input#search-albums(type='text', x-webkit-speech='x-webkit-speech')
-    tbody#search-results
-      tr.search-result-item
-        td.add
-        td.play
-        td.track
-        td.title
-        td.artist
-        td.album
-
+table#library
+  thead
+    tr
+      th
+        | Title
+        //-input#search-titles(type='text', x-webkit-speech='x-webkit-speech')
+      th
+        | Artist
+        //-input#search-artists(type='text', x-webkit-speech='x-webkit-speech')
+      th
+        | Album
+        //-input#search-albums(type='text', x-webkit-speech='x-webkit-speech')
+  tbody#search-results
+    tr.search-result-item
+      td.add
+      td.play
+      td.track
+      td.title
+      td.artist
+      td.album
