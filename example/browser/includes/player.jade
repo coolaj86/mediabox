@@ -1,51 +1,91 @@
 .mb-player
-  .css-mb-leftbox
-    span.mb-audios
-    button.mb-play |&gt;
-    button.mb-pause ||
-    span.css-audio-progress
-      progress.css-progress-buffer.mb-buffer(max="1", value="0")
-      input.css-progress-audio.mb-progress(type="range", min="0", max="300", value="0")
-    button.css-thumbs.mb-thumbs-down
-      img.css-mb-thumb-img(src='images/thumbs-down.png')
-    button.css-thumbs.mb-thumbs-up
-      img.css-mb-thumb-img(src='images/thumbs-up.png')
-    button.css-mb-rating-img
-      img.mb-rating-img(src='images/rating+0.png')
-    span.css-buffering-spinny.mb-buffering
-      img(src='/images/loading.gif')
-    br
-    span.css-playtimes.mb-playtime
-      | 0:00
-    span.css-playtimes.mb-playtime-total
-      | 0:00
-    span.css-playtimes.mb-playtime-remaining
-      | 0:00
-    br
-    button.mb-previous &lt;&lt;
-    button.mb-pos-back &lt;
-    button.mb-pos-forward &gt;
-    button.mb-next &gt;&gt;
-    //- for things such as audio books and podcasts
-    button.mb-not-music(title="Audio Book, Podcast, Goat Noises, etc")
-      | Not Music
-    //- for things such as chicken dance, christmas music, hymns, and such
-    button.mb-specialty-music(title="Chicken Dance, Christmas, Hymn, etc")
-      | Special
-    br
-    button.mb-vol-mute Mute
-    span.css-volume-level
-      progress.css-level-raw.mb-volume-raw(max="1000", value="0")
-      input(type="range").css-level.mb-volume(min="0", max="1000", value="0")
-    button.mb-vol-down -Vol
-    button.mb-vol-up +Vol
-    div.mb-art
-  .css-mb-rightbox
-    ul.css-now-playing
-      li.mb-title
-      li.mb-artist
-      li.mb-album
+  .css-logo.css-lala-logo
+    span.css-logo-top
+      | Media
+    span.css-logo-bottom
+      | Box
 
+  .css-lala-controls
+    .css-lala-controls-top
+      div.mb-previous.css-control-button.css-control-prev
+        .css-lala-bar
+        .css-lala-left
+        .css-lala-left
+      div.mb-pos-back.css-control-button.css-control-back
+        .css-lala-bar
+        .css-lala-left
+      div.mb-play.css-control-button.css-control-play
+        .css-lala-right-big
+      div.mb-pause.css-control-button.css-control-pause
+        .css-lala-bar
+        .css-lala-bar-clear
+        .css-lala-bar
+      div.mb-pos-forward.css-control-button.css-control-forward
+        .css-lala-right
+        .css-lala-bar
+      div.mb-next.css-control-button.css-control-next
+        .css-lala-right
+        .css-lala-right
+        .css-lala-bar
+    .css-lala-controls-bottom
+      img(src="images/volume_unmute.png", alt="mute").mb-vol-mute
+      span.css-volume-level
+        progress.css-level-raw.mb-volume-raw(max="1000", value="0")
+        input(type="range").css-level.mb-volume(min="0", max="1000", value="0")
+      .css-vol-up-down
+        .mb-vol-up.css-vol-up +
+        .mb-vol-down.css-vol-down -
+    
+  .css-lala-queue
+    | Queue:
+    br
+    | #
+
+  .css-lala-status
+    .mb-art.css-album-art
+      img(src='images/unknown-album.png')
+
+    .css-track-info
+      .css-track-meta
+        .mb-title
+        .css-album-data
+          |  by 
+          span.mb-artist
+          |  on 
+          span.mb-album
+      .css-track-progress.css-audio-progress
+        span.css-playtimes.mb-playtime
+          | 0:00
+        .css-progress-container
+          span.css-buffering-spinny.mb-buffering
+            img(src='/images/loading.gif')
+          progress.css-progress-buffer.mb-buffer(max="1", value="0")
+          input.css-progress-audio.mb-progress(type="range", min="0", max="300", value="0")
+          span.css-playtimes.mb-playtime-total
+            | 0:00
+        span.css-playtimes.mb-playtime-remaining
+          | 0:00
+          
+    .css-track-rating
+      button.css-thumbs.mb-thumbs-down
+        img.css-mb-thumb-img(src='images/thumbs-down.png')
+      button.css-thumbs.mb-thumbs-up
+        img.css-mb-thumb-img(src='images/thumbs-up.png')
+      button.css-mb-rating-img
+        img.mb-rating-img(src='images/rating+0.png')
+
+  .css-lala-share
+
+  .css-lala-search
+
+  span.mb-audios
+
+  //- for things such as audio books and podcasts
+  button.mb-not-music(title="Audio Book, Podcast, Goat Noises, etc")
+    | Not Music
+  //- for things such as chicken dance, christmas music, hymns, and such
+  button.mb-specialty-music(title="Chicken Dance, Christmas, Hymn, etc")
+    | Special
 .css-mb-music-style.mb-music-style Dance Style
   .mb-audio(data-mb-music-style="notmusic") Non-music
     .mb-ebook(data-mb-music-style="ebook") eBook

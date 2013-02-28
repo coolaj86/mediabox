@@ -203,8 +203,10 @@ eqeqeq:true immed:true latedef:true*/
       $(selector).delegate(selectors.mute, 'click', function () {
         if (strategy.isMuted()) {
           strategy.unmute();
+          $(this).attr('src', 'images/volume_unmute.png');
         } else {
           strategy.mute();
+          $(this).attr('src', 'images/volume_mute.png');
         }
       });
 
