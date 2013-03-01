@@ -5,16 +5,20 @@ html
     link(href='style.css', rel='stylesheet', type='text/css', media='screen')
     script(src='pakmanaged.js')
   body
-    .css-big-player.css-lala-player-bar
-      include includes/player
-    #loading 
-      .loading_innard MediaBox loves you, and is now loading.
+    .css-content-container
+      .css-big-player.css-lala-player-bar
+        include includes/player
+      .css-lala-separator-bar
+      .css-library
+        include includes/organizer
+        include includes/playlist
+      #loading 
+        .loading_innard MediaBox loves you, and is now loading.
 
-    #content
-      include includes/categorize
-      include includes/search
+      #content
+        include includes/categorize
+        include includes/search
 
-      include includes/playlist
-      include includes/playlist-history
+        include includes/playlist-history
 
-      include includes/updrop
+        include includes/updrop

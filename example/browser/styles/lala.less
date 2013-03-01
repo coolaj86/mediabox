@@ -69,12 +69,12 @@
     height: 0.5em;
 
     .css-level-raw {
-      height: 0.5em
-      width: 9em;
+      height: 0.5em;
+      width: 6em;
     }
     .css-level {
-      height: 0.5em
-      width: 9em;
+      height: 0.5em;
+      width: 10em;
     }
   }
   .css-lala-controls-bottom > * {
@@ -162,9 +162,14 @@
   height: 2.9em;
   width: 22.6em;
 
+  border-right: 1px solid #28AAF0;
+  border-top: none;
+  border-left: 1px solid #28AAF0;
+  border-bottom: 1px solid #28AAF0;
+
   background-color: rgba(32, 130, 190, 0.8);
   margin-left: 1em;
-  box-shadow: inset 0 0 10px #000000;
+  box-shadow: inset 0px 0px 6px 1px #333;
   border-radius: 0 0 5px 5px;
 
   .css-album-art img {
@@ -182,7 +187,7 @@
   }
   .css-track-info {
     float: left;
-    width: 13em;
+    width: 11em;
     margin-top: 0.1em;
     margin-right: 0.3em;
     margin-left: 0.3em;
@@ -202,12 +207,12 @@
 }
 
 .css-lala-search {
-  float: left;
-  width: 14.4em;
+  float: right;
   height: 2.1em;
+
   margin-top: 1em;
   margin-bottom: 1em;
-  margin-right: 1.5em;
+  margin-right: 1em;
 
   input {
     background-color: #FFFEFB;
@@ -227,4 +232,143 @@
   background: -o-linear-gradient(top, #323232 0%,#646464 100%); /* Opera 11.10+ */
   background: -ms-linear-gradient(top, #323232 0%,#646464 100%); /* IE10+ */
   background: linear-gradient(to bottom, #323232 0%,#646464 100%); /* W3C */
+  box-shadow: 0px 4px 35px 1px #666
+}
+
+.css-big-player {
+  width: 100%;
+  margin: 0;
+  #npwrapper {
+    margin: 0 auto;
+    padding: 10px 0;
+  }
+}
+
+.less-no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.css-mb-music-style {
+  .less-no-select;
+  float: right;
+  width: 150px;
+  font-size: 10pt;
+  background-color: grey;
+  * {
+    background-color: grey;
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid;
+  }
+  *:hover {
+    border: 1px solid red;
+    background-color: black;
+    color: white;
+  }
+  .css-selected {
+    border: 1px solid green;
+    background-color: white;
+    color: black;
+  }
+}
+
+.css-mb-leftbox {
+  display: inline-block;
+}
+
+.css-mb-rightbox {
+  display: inline-block;
+}
+
+.css-mb-rating-img {
+  width: 24px;
+  height: 24px;
+  background-color: rgba(255,255,255,1);
+  border: none;
+
+  padding: 2px 1px 0px 1px;
+  border-radius: 4px;
+  box-shadow: 0px 0px 20px 1px #CCC
+}
+
+.css-mb-thumb-img {
+  width: 16px;
+  height: 16px;
+}
+
+.css-playtimes {
+  font-size: 8pt;
+  font-family: 'Prosto One', sans-serif;
+  padding-left: 0.3em;
+  margin: 0.1em;
+  display: inline-block;
+}
+
+.less-hybrid-progress-container {
+  position: relative;
+  display: inline-block;
+  height: 0.5em;
+  border: solid 1px black;
+}
+
+.less-hybrid-progress {
+  position: absolute;
+}
+.less-hybrid-progress-lower {
+  .less-hybrid-progress;
+  opacity: 0.6;
+}
+
+.css-volume-level {
+  .less-hybrid-progress-container;
+  width: 6em;
+
+  .css-level {
+    .less-hybrid-progress;
+    width: 10em;
+  }
+  .css-level-raw {
+    .less-hybrid-progress-lower;
+    width: 6em;
+  }
+}
+
+
+.css-audio-progress {
+  .less-hybrid-progress-container;
+  width: 11em;
+}
+
+.css-progress-buffer {
+  .less-hybrid-progress-lower;
+  width: 11em;
+  height: 0.5em;
+  /* 
+  // Tried stacked progress bars. It was really neat, but not functional once
+  // you started scrolling...
+  position: fixed;
+  top: 1.82em;
+  left: 3.59em;
+  */
+}
+
+.css-progress-audio {
+  .less-hybrid-progress;
+  width: 18.5em;
+  height: 0.5em;
+}
+
+.css-thumbs {
+  padding: 3px 0 0 0;
+}
+
+.css-buffering-spinny {
+  position: fixed;
+  right: 0px;
 }
