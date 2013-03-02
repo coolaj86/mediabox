@@ -98,6 +98,7 @@ indent:2 eqeqeq:true immed:true latedef:true*/
     }
 
     MegaUpload.create('ul#uploadlist', updateTags, metas, filesMap);
+    $('.js-uploading').closest('.js-metalist-tab').show();
   }
 
   function attachHandlers() {

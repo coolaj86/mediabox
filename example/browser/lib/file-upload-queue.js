@@ -76,25 +76,26 @@
         console.log('result');
         console.log(data.result);
 
-        Object.keys(data.result).forEach(function (key) {
-          var rmeta = data.result[key]
-            , meta = metas[rmeta.name]
+        Object.keys(data.result).forEach(function (fieldname) {
+          var fileinfo = data.result[fieldname]
+            , meta = metas[fieldname]
             ;
 
-          if (!metas[rmeta.name]) {
+          if (!metas[fieldname]) {
             console.error("got back an id we didn't ask for");
-            console.error(rmeta);
+            console.error(fileinfo);
             return;
           }
 
           // TODO calculate md5sum client-side to save on bandwidth
           // TODO that would need to be a sparse md5sum with size and type
           // TODO the response should be in a more sane format
-          meta.md5sum = rmeta.value[0].md5sum;
+          meta.md5sum = fileinfo.md5;
+          meta.md5 = fileinfo.md5;
         });
 
         keys.forEach(function (key) {
-          if (!metas[key].md5sum) {
+          if (!metas[key].md5) {
             console.error("something failed to upload");
             console.error(key, metas);
             // TODO log failures in client
