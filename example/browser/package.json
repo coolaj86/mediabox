@@ -23,6 +23,9 @@
     "json-storage": "1.x",
     "qwery": "3.x"
   },
+  "noneDeps": {
+    "weld": "0.2.3"
+  },
   "dependencies": {},
   "devDependencies": {}
 }

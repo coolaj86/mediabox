@@ -4,7 +4,15 @@
       span Collection
       .css-collection-options
     ul
-      li.css-actionable [upload new songs]
+      li.css-actionable
+        //- TODO nix unused classes
+        .js-file-drop-zone.css-file-drop-zone.tall.file-zone.area.interactive
+          form.upload
+            //- webkitdirectory allows ONLY directories
+            //- input#filechooser.filechooser(name='file',type='file',multiple='multiple')
+
+          button.button.gray.small Upload Song
+
       li All songs
       li Recent adds
       li Recent uploads

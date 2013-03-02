@@ -1,8 +1,14 @@
-table#library
+table.css-search-results
   thead
-    tr
+    tr.css-header
       th
-        | Title
+        //- playlist-order
+      th
+        //- add to queue
+      th
+        //- preview now
+      th
+        | Song
         //-input#search-titles(type='text', x-webkit-speech='x-webkit-speech')
       th
         | Artist
@@ -10,11 +16,29 @@ table#library
       th
         | Album
         //-input#search-albums(type='text', x-webkit-speech='x-webkit-speech')
+      th
+        | Time
+      th
+        | Track
+      th
+        | Rating
+      th
+        | Plays
+      th
+        | Added
+      th
+        | Played
   tbody#search-results
     tr.search-result-item
+      td.order
       td.add
       td.play
-      td.track
       td.title
       td.artist
       td.album
+      td.time
+      td.track
+      td.rating
+      td.plays
+      td.added
+      td.played

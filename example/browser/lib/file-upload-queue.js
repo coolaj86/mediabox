@@ -29,7 +29,7 @@
     return (size / (1024 * 1024 * 1024)).toFixed(1) + ' GiB';
   }
 
-  function create(onSuccess, metas, files) {
+  function create(muSelector, onSuccess, metas, files) {
     function sortBySize(a, b) {
       return metas[a].size > metas[b].size ? -1 : 1;
     }
@@ -45,26 +45,28 @@
         ;
 
       function cleanupUi(err, ahr, data) {
+        /*
         var rmetas = {}
           ;
+        */
 
         if (err) {
-          alert('error uploading data');
+          window.alert('error uploading data');
           console.error(err);
           return;
         }
 
         if (data.error || !data.result) {
-          alert('error uploading data');
+          window.alert('error uploading data');
           console.error(data);
           return;
         }
 
         // TODO add new data to client db
 
-        keys.forEach(function (key, i) {
-          var file = files[key]
-            , link = els[key]
+        keys.forEach(function (key) {
+          var link = els[key]
+            //, file = files[key]
             ;
 
           // TODO move from progress to complete area
@@ -74,8 +76,9 @@
         console.log('result');
         console.log(data.result);
 
-        data.result.forEach(function (rmeta) {
-          var meta = metas[rmeta.name]
+        Object.keys(data.result).forEach(function (key) {
+          var rmeta = data.result[key]
+            , meta = metas[rmeta.name]
             ;
 
           if (!metas[rmeta.name]) {
@@ -105,14 +108,13 @@
 
       function updateProgress(ev) {
         var totalLoaded = ev.loaded
-          , i
           , file
           , bytesLeft
           , link
           , bytesLoaded
           ;
 
-        keys.forEach(function (key, i) {
+        keys.forEach(function (key) {
           file = files[key];
           link = els[key];
 
@@ -151,12 +153,12 @@
           ;
         
         if (err) {
-          alert('error with upload');
+          window.alert('error with upload');
           return;
         }
 
         if (data.error || !data.result) {
-          alert('different error with upload');
+          window.alert('different error with upload');
           return;
         }
 
@@ -182,18 +184,18 @@
       link.find('progress').find('.max', String(meta.size));
       link.find('.remove-file').hide();
 
-      $('ul#uploadlist').prepend(link);
+      $(muSelector).prepend(link);
       formData.append(key, files[key]);
     }
+    
+    $.domReady(function () {
+      linkTpl = $(muSelector).html();
+      $(muSelector).html('');
+    });
 
     keys.forEach(startUi);
     sequence.then(nextMeta);
   }
-
-  $.domReady(function () {
-    linkTpl = $('ul#uploadlist').html();
-    $('ul#uploadlist').html('');
-  });
 
   module.exports.create = create;
 }());

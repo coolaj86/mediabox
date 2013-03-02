@@ -1,18 +1,6 @@
 #drop.uiview.drop.index
   #drop-container.drop-container
     header Drop
-    #dropzone.tall.file-zone.area.interactive
-      //- http://www.softicons.com/free-icons/web-icons/design-cartons-icons-by-sneh-roy/box-drag-and-drop-icon
-      img.drop-action-image(src='images/drag-n-drop-box.png',alt='Drag & Drop Files from your Desktop')
-      //- TODO find out why this is laggy when placed outside of #dropzone
-      form.upload
-        //- webkitdirectory allows ONLY directories
-        //- input#filechooser.filechooser(name='file',type='file',multiple='multiple')
-
-      button.button.gray Open File Browser
-      form.upload
-        //- input.filechooser(name='file',type='file',multiple='multiple')
-
     .tall.area.interactive
       ul#uploadlist.tabs
         li.tab.file-info
@@ -29,7 +17,7 @@
 
   #local-drop-container.drop-container
     header Local Preview
-    #local-dropzone.tall.file-zone.area.interactive
+    .local-dropzone.tall.file-zone.area.interactive
       //- http://www.softicons.com/free-icons/web-icons/design-cartons-icons-by-sneh-roy/box-drag-and-drop-icon
       img.drop-action-image(src='images/drag-n-drop-box.png',alt='Drag & Drop Files from your Desktop')
       //- TODO find out why this is laggy when placed outside of #dropzone

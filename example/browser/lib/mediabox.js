@@ -6,6 +6,7 @@ eqeqeq:true immed:true latedef:true*/
 
   var asciify = require('./asciify')
     , request = require('ahr2')
+    //, weld = require('weld')
     , targetInfo = require('./target-info')
     , tags
     , playerSel = '.mb-player'
@@ -239,6 +240,7 @@ eqeqeq:true immed:true latedef:true*/
     });
 
     $('#results').html(html.join('\n'));
+    $('#search-results').closest('.js-metalist-tab').show();
     $('#search-results')[0].innerHTML = resultItemRows.join('\n');
   }
 
@@ -374,7 +376,7 @@ eqeqeq:true immed:true latedef:true*/
         // TODO only update current list
         // TODO this._list
         $(playQueueSel).find('.has-md5sum').remove();
-        this._list.forEach(function (item, i) {
+        this._list.forEach(function (item) {
           if (!item.el) {
             // adds el, audio, and md5sum
             createDomForTag(item);
@@ -384,6 +386,11 @@ eqeqeq:true immed:true latedef:true*/
         });
       });
     });
+  }
+
+  function toggleQueue() {
+    $('.mb-playlist-container').closest('.js-playlist-tab').toggle();
+    $('.js-toggle-queue').toggleClass('css-queue-on');
   }
 
   function attachHandlers() {
@@ -397,6 +404,7 @@ eqeqeq:true immed:true latedef:true*/
     $('body').delegate('.remove .ui-action', 'click', onRemoveFromPlaylist);
     $('body').delegate('.add .ui-action', 'click', onAddToPlaylist);
     $('body').delegate('.play .ui-action', 'click', onPlayNow);
+    $('body').delegate('.js-toggle-queue', 'click', toggleQueue);
   }
 
   module.exports.create = function () {
