@@ -108,7 +108,7 @@ indent:2 eqeqeq:true immed:true latedef:true*/
     // TODO set the class on the button for hover even though
     // it's masked by the file chooser above it
     // NOTE the file-chooser doesn't work if the content area is hidden and then .show()n
-    Updrop.create(handleLocalLoad, 'body', '.local-dropzone');
+    //Updrop.create(handleLocalLoad, 'body', '.local-dropzone');
     Updrop.create(handleUpload, 'body', '.js-file-drop-zone');
 
     abstracter = Updrop.abstract(handleUpload);
