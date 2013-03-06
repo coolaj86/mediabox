@@ -23,7 +23,7 @@ eqeqeq:true immed:true latedef:true*/
     , MB_TITLES = 0
     , MB_PATHS = 1
     , searchable
-    , playQueueSel = '.mb-playlist'
+    , playQueueSel = '.mb-playlist tbody'
     ;
 
   function basename(path, ext) {
@@ -225,6 +225,7 @@ eqeqeq:true immed:true latedef:true*/
       }
       resultItemRows.push("" +
         "<tr data-md5sum='" + md5sum + "' class='has-md5sum result'>" + 
+          "<td></td>" + 
           "<td class='add'>" + 
             "<a class='ui-action' href='" + resource + "'>[+]</a>   " + 
           "</td>" +
@@ -234,6 +235,12 @@ eqeqeq:true immed:true latedef:true*/
           "<td class='title'>" + tag.title + "</td>" +
           "<td class='artist'>" + tag.artist + "</td>" +
           "<td class='album'>" + tag.album + "</td>" +
+          "<td></td>" + 
+          "<td></td>" + 
+          "<td></td>" + 
+          "<td></td>" + 
+          "<td></td>" + 
+          "<td></td>" + 
           "</td>" +
         "</tr>" +
       "");
@@ -258,22 +265,22 @@ eqeqeq:true immed:true latedef:true*/
     tag.el = $(
       "<tr data-md5sum='" + md5sum + "' class='has-md5sum playlistitem'>" +
         "<td class='add'>" +
-          "<button class='ui-action'>+</button>   " +
+          "<span class='ui-action'>+</button>   " +
         "</td>" +
         "<td class='play'>" +
-          "<button class='ui-action'>|></button>   " +
+          "<span class='ui-action'>|></button>   " +
         "</td>" +
         "<td class='promote'>" +
-          "<button class='ui-action'>&uarr;</button>   " +
+          "<span class='ui-action'>&uarr;</button>   " +
         "</td>" +
         "<td class='demote'>" +
-          "<button class='ui-action'>&darr;</button>   " +
+          "<span class='ui-action'>&darr;</button>   " +
         "</td>" +
         "<td class='title'>" + tag.title + "</td>" +
         "<td class='artist'>" + tag.artist + "</td>" +
         "<td class='album'>" + tag.album + "</td>" +
         "<td class='remove'>" +
-          "<button class='ui-action'>X</button>   " +
+          "<span class='ui-action'>X</button>   " +
         "</td>" +
       "</tr>"
     );
