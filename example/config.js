@@ -10,7 +10,7 @@
     // using the full dirname is too many chars for exec
     // dbroot: __dirname + '/' + '../tests/testdb/'
     //, tmproot: 'testdb/tmp'
-    , filesroot: path.resolev(__dirname, '../testdb/files/all')
+    , filesroot: path.resolve(__dirname, '../tests/testdb/files/all')
     //, metaroot: 'testdb/meta'
     //, audioroot: 'testdb/audio'
     , automountDir: path.resolve(__dirname, '../tests/automounts')
