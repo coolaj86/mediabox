@@ -5,9 +5,11 @@
     , request = require('ahr2')
     //, EventEmitter = require('events').EventEmitter
     , targetInfo = require('./target-info')
-    , $ = require('ender')
+    , $ = require('jQuery')
     , linkTpl
     ;
+
+  $.domReady = $;
 
   function toByteCount(size) {
     // 102.4

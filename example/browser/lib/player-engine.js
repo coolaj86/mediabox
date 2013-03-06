@@ -16,7 +16,7 @@ eqeqeq:true immed:true latedef:true*/
   "use strict";
 
   var EventEmitter = require('events').EventEmitter
-    , $ = require('ender')
+    , $ = require('jQuery')
       // TODO fadeVolume needs a token
     , fadeVolume = require('./volume-fader')
     , allMediaEvents

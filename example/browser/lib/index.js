@@ -9,8 +9,10 @@ indent:2 eqeqeq:true immed:true latedef:true*/
   var Updrop = require('./updrop')
     , MegaUpload = require('./file-upload-queue')
     , MediaBox = require('./mediabox')
-    , $ = require('ender')
+    , $ = require('jQuery')
     ;
+
+  $.domReady = $;
 
   function randomString() {
     return Math.floor(Math.random() * 10000000000000000000000).toString(36);

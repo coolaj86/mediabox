@@ -16,15 +16,15 @@
     "ahr2": "2.x",
     "underscore": "1.x",
     "pure": "2.x",
-    "bean": "0.4.x",
     "domready": "0.2.x",
     "sequence": "2.x",
-    "bonzo": "0.9.x",
     "json-storage": "1.x",
-    "qwery": "3.x"
   },
   "noneDeps": {
     "weld": "0.2.3"
+    "bean": "0.4.x",
+    "bonzo": "0.9.x",
+    "qwery": "3.x"
   },
   "dependencies": {},
   "devDependencies": {}

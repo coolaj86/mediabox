@@ -4,8 +4,10 @@ eqeqeq:true immed:true latedef:true*/
 (function () {
   "use strict";
 
-  var $ = require('ender')
+  var $ = require('jQuery')
     ;
+
+  $.domReady = $;
 
   function pad(str) {
     str = str.toString();
