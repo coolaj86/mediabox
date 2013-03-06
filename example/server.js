@@ -7,20 +7,15 @@
     , connect = require('connect')
     , mediabox
     , server
-    , port = process.argv[2] || config.port || 1232
     ;
 
   if (!connect.router) {
     connect.router = require('connect_router');
   }
 
-  function started() {
-    console.info('listening on port ' + port);
-  }
-
-  function startServer() {
+  function startServer(port, onListening) {
     console.info('Starting server...');
-    server.listen(port, started);
+    server._oldListen(port, onListening);
     // TODO import old db log
   }
 
@@ -33,6 +28,25 @@
 
   server.use('/api', mediabox);
 
-  console.info('Initing mediabox (folders, databases, etc)');
-  mediabox.init(startServer);
+  server._oldListen = server.listen;
+  server.listen = function (port, onStart) {
+    console.info('Initing mediabox (folders, databases, etc)');
+    mediabox.init(startServer.bind(null, port, onStart));
+  };
+
+  module.exports = server;
+
+  function run () {
+    var port = process.argv[2] || config.port || 1232
+      ;
+
+    function started() {
+      console.info('listening on port ' + port);
+    }
+    server.listen(port, started);
+  }
+
+  if (require.main === module) {
+    run();
+  }
 }());
