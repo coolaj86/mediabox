@@ -18,10 +18,10 @@
     "pure": "2.x",
     "domready": "0.2.x",
     "sequence": "2.x",
-    "json-storage": "1.x",
+    "json-storage": "1.x"
   },
   "noneDeps": {
-    "weld": "0.2.3"
+    "weld": "0.2.3",
     "bean": "0.4.x",
     "bonzo": "0.9.x",
     "qwery": "3.x"
