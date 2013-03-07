@@ -1,0 +1,24 @@
+!!!5
+html
+  head
+    title The Fradio - MediaBox
+    link(href='style.css', rel='stylesheet', type='text/css', media='screen')
+    //script(src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js")
+    script(src="js/jquery.js")
+    script(src="pakmanaged.js")
+  body
+    .css-content-container.css-blur
+      .css-big-player.css-lala-player-bar
+        include includes/player
+      .css-lala-separator-bar
+      .css-library
+        include includes/organizer
+        include includes/metalist
+        include includes/playlist
+      .css-clear
+    //-
+      .css-content
+        include includes/categorize
+        include includes/updrop
+    .js-loading.css-loading-mask
+      | Loading...

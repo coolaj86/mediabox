@@ -1,6 +1,6 @@
 #!/bin/bash
-node app testroot/
+node ../example/test-app.js testroot/
 echo FILES
-ls -lah testdb/files/*/*
+find testdb/files/ -type f
 echo SYMLINKS
-ls -lah testdb/meta/*/*
+find testdb/meta/ -type f

@@ -2,21 +2,22 @@
   "use strict";
 
   var config
+    , path = require('path')
     ;
 
-  config = {
-      dbroot: '../tests/testdb/'
+  config =
+    { dbroot: path.resolve(__dirname, '../tests/testdb/')
     // using the full dirname is too many chars for exec
     // dbroot: __dirname + '/' + '../tests/testdb/'
     //, tmproot: 'testdb/tmp'
-    //, filesroot: 'testdb/files'
+    , filesroot: path.resolve(__dirname, '../tests/testdb/files/all')
     //, metaroot: 'testdb/meta'
     //, audioroot: 'testdb/audio'
-    , automountDir: '../tests/automounts'
+    , automountDir: path.resolve(__dirname, '../tests/automounts')
     , remove: false
     , hardlink: true
     , softlink: false
-  };
+    };
 
   module.exports = config;
 }());

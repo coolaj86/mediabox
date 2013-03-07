@@ -1,11 +1,29 @@
-Usage (for alpha testing)
+Installation
 ===
 
     git clone git://github.com/coolaj86/mediabox.git MediaBox
     cd MediaBox
-    git checkout modularized
+    git checkout sqlite
+
+    npm install -g pakmanager
+    npm install -g less
+    npm install -g jade
+    npm install -g uglify-js
+    npm install -g served
+
+    npm install
+
+Run the *limited* number of tests:
+
+    pushd tests
     ./create-testroot.sh
-    node ./app ./testroot
+
+    ./run-tests.sh
+
+Open a new terminal and run the server (from the MediaBox directory)
+
+    pushd example
+    node server 1232
 
 Expected Behavior
 
@@ -30,6 +48,13 @@ Metadata for each file and symlink is written into `testdb/`
 Original files are hard-linked (if on the same device) to the md5-named file in `testdb/`.
 Symlinks are left as-is.
 The file's extension is preserved with a symlink to the md5-named file.
+
+Usage (for alpha testing)
+===
+
+You're going to need some music to test on. You can find a number of free mp3s at 
+<http://www.last.fm/music/+free-music-downloads>
+
 
 Stat Example
 ===

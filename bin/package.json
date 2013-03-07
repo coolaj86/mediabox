@@ -1,0 +1,28 @@
+{
+  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info/)",
+  "name": "mediabox-cli",
+  "description": "Commandline tools for MediaBox",
+  "version": "0.1.0",
+  "homepage": "https://github.com/coolaj86/MediaBox",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/coolaj86/mediabox.git"
+  },
+  "main": "mediabox-move",
+  "scripts": {
+    "test": "node mediabox-move"
+  },
+  "engines": {
+    "node": ">= 0.4"
+  },
+  "dependencies": {
+    "ahr2": "2.x",
+    "File": "0.10.x",
+    "forEachAsync": "2.x",
+    "FormData": "0.10.x",
+    "node-uuid": "1.x",
+    "walk": "2.x"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {}
+}

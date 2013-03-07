@@ -1,0 +1,88 @@
+.mb-player
+  span.mb-audios
+  .css-lala-left
+    .css-logo.css-lala-logo
+      .css-logo-top
+        | Media
+      .css-logo-bottom
+        | Box
+
+  .css-lala-middle
+    .css-lala-controls
+      .css-lala-controls-top
+        div.mb-previous.css-control-button.css-control-prev
+          .css-lala-bar
+          .css-lala-left
+          .css-lala-left
+        div.mb-pos-back.css-control-button.css-control-back
+          .css-lala-bar
+          .css-lala-left
+        div.mb-play.css-control-button.css-control-play
+          .css-lala-right-big
+        div.mb-pause.css-control-button.css-control-pause
+          .css-lala-bar
+          .css-lala-bar-clear
+          .css-lala-bar
+        div.mb-pos-forward.css-control-button.css-control-forward
+          .css-lala-right
+          .css-lala-bar
+        div.mb-next.css-control-button.css-control-next
+          .css-lala-right
+          .css-lala-right
+          .css-lala-bar
+      .css-lala-controls-bottom
+        img(src="images/volume_unmute.png", alt="mute").mb-vol-mute
+        span.css-volume-level
+          progress.css-level-raw.mb-volume-raw(max="1000", value="0")
+          input(type="range").css-level.mb-volume(min="0", max="1000", value="0")
+        .css-vol-up-down
+          .mb-vol-up.css-vol-up +
+          .mb-vol-down.css-vol-down -
+      
+    .js-toggle-queue.css-lala-queue
+      | Queue:
+      br
+      | #
+
+    .css-lala-status
+      .mb-art.css-album-art
+        img(src='images/unknown-album.png')
+
+      .css-playtimes
+        .css-buffering.mb-buffering
+          include spinner.html
+        .mb-playtime.css-playtimes-playtime 0:00
+
+      .css-track-info
+        .css-track-meta
+          .css-track-title.mb-title Track
+          .css-album-data
+            |  by 
+            span.mb-artist Artist
+            |  on 
+            span.mb-album Album
+        .css-track-progress.css-audio-progress
+          .css-progress-container
+            progress.css-progress-buffer.mb-buffer(max="1", value="0")
+            input.css-progress-audio.mb-progress(type="range", min="0", max="300", value="0")
+            .css-playtimes.mb-playtime-total 0:00
+
+      .css-playtimes
+        .css-track-rating
+          span.css-thumbs.mb-thumbs-down
+            img.css-mb-thumb-img(src='images/thumbs-down.png')
+          span.css-thumbs.mb-thumbs-up
+            img.css-mb-thumb-img(src='images/thumbs-up.png')
+          span.css-mb-rating-img
+            img.mb-rating-img(src='images/rating+0.png')
+        .mb-playtime-remaining.css-playtimes-remaining
+          | 0:00
+            
+    .css-lala-share
+
+  .css-lala-right
+    .css-lala-search
+      form#search(action="#fixme")
+        input#search-library(x-webkit-speech="x-webkit-speech", placeholder="Search Library")
+        button
+          img#submit(type="submit", src="images/search-magnifying-glass.png")
