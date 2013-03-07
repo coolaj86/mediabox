@@ -1,15 +1,11 @@
 (function () {
   "use strict";
 
-  var window = require('window')
-    , location = window.location
-    ;
-
   function getLocation() {
     return {
         "protocol": "http:"
-      , "hostname": location.hostname //"getmediabox.com"
-      , "host": location.host // "getmediabox.com"
+      , "hostname": "getmediabox.com"
+      , "host": "getmediabox.com"
       , "port": ""
       , "pathname": "/api"
     };
