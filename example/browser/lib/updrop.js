@@ -17,10 +17,12 @@
   function createFileSelectOrDropHandler(callback) {
     function handleFileSelectOrDrop(ev) {
       /*jshint validthis:true*/
-      console.log('1');
+      console.log('handleFileSelectOrDrop', ev);
       ev.preventDefault();
       ev.stopPropagation();
 
+      // TODO jQuery.event.props.push("dataTransfer");
+      ev = ev.originalEvent || ev;
       var files = this.files || ev.dataTransfer && ev.dataTransfer.files
         ;
 

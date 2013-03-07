@@ -7,7 +7,7 @@ html
     script(src="js/jquery.js")
     script(src="pakmanaged.js")
   body
-    .css-content-container
+    .css-content-container.css-blur
       .css-big-player.css-lala-player-bar
         include includes/player
       .css-lala-separator-bar
@@ -16,10 +16,9 @@ html
         include includes/metalist
         include includes/playlist
       .css-clear
-      #loading 
-        .loading_innard MediaBox loves you, and is now loading.
-
     //-
-      #content
+      .css-content
         include includes/categorize
         include includes/updrop
+    .js-loading.css-loading-mask
+      | Loading...

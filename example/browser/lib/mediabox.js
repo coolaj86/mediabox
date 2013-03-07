@@ -371,8 +371,8 @@
         return;
       }
 
-      $('#loading').hide();
-      $('#content').show();
+      $('.js-loading').hide();
+      $('.css-content-container').removeClass('css-blur');
       tags = data.result;
       tags.sort(randomize);
       PlayQueue.init(tags, createDomForTag);

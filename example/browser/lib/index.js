@@ -1,6 +1,3 @@
-/*jshint strict:true node:true es5:true browser:true
-onevar:true laxcomma:true laxbreak:true
-indent:2 eqeqeq:true immed:true latedef:true*/
 (function () {
   "use strict";
 
@@ -18,44 +15,8 @@ indent:2 eqeqeq:true immed:true latedef:true*/
     return Math.floor(Math.random() * 10000000000000000000000).toString(36);
   }
 
-  function readFile(file) {
-    var FileReader = require('FileReader')
-      , fileReader = new FileReader()
-      ;
-
-    fileReader.onload = function (ev) {
-      console.log('load');
-      var audio = new Audio()
-        ;
-
-      audio.src = ev.target.result;
-      global.localAudioFiles.push(audio);
-      global.localFileDataUrls.push(ev.target.result);
-    };
-
-    global.localFiles.push(file);
-    console.log('about to read');
-    fileReader.readAsDataURL(file);
-    console.log('about to read 2');
-  }
-
-  function handleLocalLoad(files) {
-    var i
-      , file
-      ;
-
-    global.localFiles = global.localFiles || [];
-    global.localAudioFiles = global.localAudioFiles || [];
-    global.localFileDataUrls = global.localFileDataUrls || [];
-
-    for (i = 0; i < files.length; i += 1) {
-      readFile(files[i]);
-    }
-  }
-
   function handleUpload(files) {
-    var postBody = {}
-      , i
+    var i
       , metas = {}
       , file
       , id
@@ -64,6 +25,8 @@ indent:2 eqeqeq:true immed:true latedef:true*/
 
     // TODO document if files.length is always present or no
     if (!files || !files.length) {
+      console.error(this);
+      console.error(files);
       window.alert('No files specified');
       return;
     }   
@@ -111,11 +74,11 @@ indent:2 eqeqeq:true immed:true latedef:true*/
     // it's masked by the file chooser above it
     // NOTE the file-chooser doesn't work if the content area is hidden and then .show()n
     //Updrop.create(handleLocalLoad, 'body', '.local-dropzone');
-    Updrop.create(handleUpload, 'body', '.js-file-drop-zone');
-
     abstracter = Updrop.abstract(handleUpload);
     $('body').bind('dragover', Updrop.handleDrag);
     $('body').bind('drop', abstracter);
+
+    Updrop.create(handleUpload, 'body', '.js-file-drop-zone');
   }
 
   MediaBox.init();
