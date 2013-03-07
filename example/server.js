@@ -1,4 +1,3 @@
-/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true*/
 (function () {
   "use strict";
 
@@ -6,49 +5,44 @@
     , config = require('./config')
     , connect = require('connect')
     , mediabox
-    , server
+    , app
     ;
 
   if (!connect.router) {
     connect.router = require('connect_router');
   }
 
-  function startServer(port, onListening) {
-    console.info('Starting server...');
-    server._oldListen(port, onListening);
+  function startServer(err) {
+    var port = process.argv[2] || config.port || 1232
+      , server
+      ;
+
+    if (err) {
+      console.error(err);
+    }
+    console.info('Starting MediaBox services (non-webserver)...');
+
+    if (require.main === module) {
+      console.info('And now starting webserver...');
+      server = app.listen(port, function () {
+        console.log('on port', server.address().port);
+      });
+    }
+    //app.listen(port, started);
     // TODO import old db log
   }
 
   mediabox = MediaBox.create(config);
 
-  server = connect.createServer();
-  server.use(connect.favicon(__dirname + '/public/favicon.ico'));
-  server.use(connect.compress({ level: 9, memLevel: 9 }));
-  server.use(connect.static(__dirname + '/public'));
+  app = connect.createServer();
+  app.use(connect.favicon(__dirname + '/public/favicon.ico'));
+  app.use(connect.compress({ level: 9, memLevel: 9 }));
+  app.use(connect.static(__dirname + '/public'));
 
-  server.use('/api', mediabox);
+  app.use('/api', mediabox);
 
-  server._oldListen = server.listen;
-  server.listen = function (port, onStart) {
-    console.info('Initing mediabox (folders, databases, etc)');
-    mediabox.init(startServer.bind(null, port, onStart));
-  };
+  console.info('Initing mediabox (folders, databases, etc)');
+  mediabox.init(startServer);
 
-  module.exports = server;
-
-  function run() {
-    var port = process.argv[2] || config.port || 1232
-      ;
-
-    function started() {
-      console.info('listening on port ' + port);
-    }
-    server.listen(port, started);
-  }
-
-  if (require.main === module) {
-    run();
-  } else {
-    mediabox.init();
-  }
+  module.exports = app;
 }());
