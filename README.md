@@ -3,7 +3,7 @@ Installation
 
     git clone git://github.com/coolaj86/mediabox.git MediaBox
     cd MediaBox
-    git checkout sqlite
+    git checkout master
 
     npm install -g pakmanager
     npm install -g less
