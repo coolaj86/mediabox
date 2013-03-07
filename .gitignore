@@ -7,3 +7,7 @@ testroot
 *.css
 *~
 public/
+npm-debug.log
+*.sqlite3
+tests/example-files
+BLAR-BLAR*
