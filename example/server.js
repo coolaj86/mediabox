@@ -36,7 +36,7 @@
 
   module.exports = server;
 
-  function run () {
+  function run() {
     var port = process.argv[2] || config.port || 1232
       ;
 
@@ -48,5 +48,7 @@
 
   if (require.main === module) {
     run();
+  } else {
+    mediabox.init();
   }
 }());
