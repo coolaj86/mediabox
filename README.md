@@ -1,28 +1,15 @@
 Usage (for alpha testing)
 ===
 
-  1. Install MediaTags
-
-        # Prebuilt binaries are available for Linux x86, ARMv7 (Linaro), and OS X
-        curl -L 'https://raw.github.com/coolaj86/mtags/master/install.sh' | sh 
-
-     NOTE: on x64 Linux and Windows you have to compile the bins yourself
-
-  2. Install MediaBox
-
-        git clone git://github.com/coolaj86/mediabox.git MediaBox
-        cd MediaBox
-        ./deploy.sh
-        node bin/server
-
-NOTE: sometimes you'll have to restart the server for the cache to update on page refresh
-
-Other Stuff
-===
+    git clone git://github.com/coolaj86/mediabox.git MediaBox
+    cd MediaBox
+    git checkout modularized
+    ./create-testroot.sh
+    node ./app ./testroot
 
 Expected Behavior
 
-The files in `testroot/` will be moved to `filedb/` according to md5sum.
+The files in `testroot/` will be moved to `testdb/` according to md5sum.
 
 If a file already exists with the name of that md5sum, but the size does not match,
 it is assumed that the existing file is the result of a partial write prior
@@ -39,8 +26,8 @@ Otherwise, they are checksummed during the copy.
 Note: In the case that writes happen very fast, this behavior is non-optimal 
 - the checksumming should occur during the copy.
 
-Metadata for each file and symlink is written into `filedb/`
-Original files are hard-linked (if on the same device) to the md5-named file in `filedb/`.
+Metadata for each file and symlink is written into `testdb/`
+Original files are hard-linked (if on the same device) to the md5-named file in `testdb/`.
 Symlinks are left as-is.
 The file's extension is preserved with a symlink to the md5-named file.
 
@@ -85,8 +72,8 @@ Notes on `stat` objects in MediaBox
 fun stuff
 
     ls -lah testroot/*/*
-    ls -lah filedb/*/*
-    rm filedb/*/*
+    ls -lah testdb/*/*
+    rm testdb/*/*
 
 Test Cases TODO
 ===
