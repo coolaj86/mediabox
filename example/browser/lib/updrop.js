@@ -1,6 +1,8 @@
 (function () {
   "use strict";
 
+  var $ = require('jQuery')
+    ;
   //
   // Drop Area Widget
   //
@@ -12,8 +14,9 @@
     ev.stopPropagation();
   }
 
-  function NewFileSelectOrDropHandler(callback) {
+  function createFileSelectOrDropHandler(callback) {
     function handleFileSelectOrDrop(ev) {
+      /*jshint validthis:true*/
       console.log('1');
       ev.preventDefault();
       ev.stopPropagation();
@@ -27,11 +30,11 @@
     return handleFileSelectOrDrop;
   }
 
-  function NewDropAreaWidget(callback, widgetRoot, dropEl) {
+  function createDropAreaWidget(callback, widgetRoot, dropEl) {
     var parentDom = $(dropEl)
       , chooser
       , chooserClass
-      , handleFileSelectOrDrop = NewFileSelectOrDropHandler(callback);
+      , handleFileSelectOrDrop = createFileSelectOrDropHandler(callback)
       ;
 
     console.log('updrop assigned');
@@ -102,7 +105,7 @@
     console.log('6');
   }
 
-  module.exports.create = NewDropAreaWidget;
-  module.exports.abstract = NewFileSelectOrDropHandler;
+  module.exports.create = createDropAreaWidget;
+  module.exports.abstract = createFileSelectOrDropHandler;
   module.exports.handleDrag = handleDrag;
 }());

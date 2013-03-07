@@ -1,10 +1,8 @@
-/*jshint strict:true node:true es5:true jquery:true browser:true
-indent:2 onevar:true laxcomma:true laxbreak:true
-eqeqeq:true immed:true latedef:true*/
 (function () {
   "use strict";
 
-  var asciify = require('./asciify')
+  var $ = require('jQuery')
+    , asciify = require('./asciify')
     , request = require('ahr2')
     //, weld = require('weld')
     , targetInfo = require('./target-info')
@@ -16,8 +14,8 @@ eqeqeq:true immed:true latedef:true*/
     // TODO previewer
     , playHistorySel = '.mb-playlist-history'
     , localStorage = require('localStorage')
-    , store = require('json-storage')(localStorage)
-    , historyStore = require('json-storage')(localStorage, 'h')
+    , store = require('json-storage').create(localStorage)
+    , historyStore = require('json-storage').create(localStorage, 'h')
     , PlayQueue = require('./play-queue').PlayQueue
     , playQueue
     , MB_TITLES = 0
