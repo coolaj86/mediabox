@@ -11,3 +11,5 @@ npm-debug.log
 *.sqlite3
 tests/example-files
 BLAR-BLAR*
+pakmanaged*
+test-files
